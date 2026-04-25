@@ -13,7 +13,7 @@ class BattleScreen:
         self.graveyard_rect = pygame.Rect(988, 330, 1280-988, 330) # Graveyard Area
         self.next_rect = pygame.Rect(988, 660, 1280-988, 60) # Graveyard Area
         self.hand_rect = pygame.Rect(170, 550, 988-170, 170) # Hand Area
-        self.avitar_rect = pygame.Rect(0, 550, 170, 170) # Avitar Area
+        self.avatar_rect = pygame.Rect(0, 550, 170, 170) # avatar Area
 
         self.cards = [
             Card("Voldemort", 10),
@@ -91,10 +91,10 @@ class BattleScreen:
         text_rect = text.get_rect(center=self.hand_rect.center)
         screen.blit(text, text_rect)
 
-        # Avitar Area
-        pygame.draw.rect(screen, (0, 100, 100), self.avitar_rect) 
-        text = self.font.render("Avitar Field", True, (255, 255, 255))
-        text_rect = text.get_rect(center=self.avitar_rect.center)
+        # Avatar Area
+        pygame.draw.rect(screen, (0, 100, 100), self.avatar_rect) 
+        text = self.font.render("avatar Field", True, (255, 255, 255))
+        text_rect = text.get_rect(center=self.avatar_rect.center)
         screen.blit(text, text_rect)
 
         #title_text = self.font.render("BATTLE SCREEN", True, (255, 255, 255))
