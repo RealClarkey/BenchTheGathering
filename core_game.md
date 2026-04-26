@@ -50,6 +50,14 @@
 
 ---
 
+## Hand Size
+- Players start with 5 cards
+- Players draw 1 card per turn
+- Maximum hand size is 7
+- If a player draws above 7 cards, excess cards are discarded
+
+---
+
 ## Mana System (CHOOSE ONE)
 
 ### Option A (slightly favouring this atm)

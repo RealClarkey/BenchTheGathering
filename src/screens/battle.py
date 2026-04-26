@@ -8,12 +8,13 @@ class BattleScreen:
         self.font = pygame.font.SysFont(None, 48)
         self.card_font = pygame.font.SysFont(None, 20)
 
-        self.battlefield_rect = pygame.Rect(0, 0, 988, 550) # Battlefield Area
-        self.card_rect = pygame.Rect(988, 0, 1280-988, 330) # Card Area
-        self.graveyard_rect = pygame.Rect(988, 330, 1280-988, 330) # Graveyard Area
-        self.next_rect = pygame.Rect(988, 660, 1280-988, 60) # Graveyard Area
-        self.hand_rect = pygame.Rect(170, 550, 988-170, 170) # Hand Area
-        self.avatar_rect = pygame.Rect(0, 550, 170, 170) # avatar Area
+        self.player_battlefield_rect = pygame.Rect(0, 275, 988, 275) # Player Battlefield Area
+        self.enemy_battlefield_rect = pygame.Rect(0, 0, 988, 275) # Enemy Battlefield Area
+        self.card_rect = pygame.Rect(988, 0, 292, 330) # Card Area
+        self.graveyard_rect = pygame.Rect(988, 330, 292, 330) # Graveyard Area
+        self.next_rect = pygame.Rect(988, 660, 292, 60) # Next Area
+        self.hand_rect = pygame.Rect(170, 550, 818, 170) # Hand Area
+        self.player_hero_rect = pygame.Rect(0, 550, 170, 170) # player_hero Area
 
         self.cards = [
             Card("Voldemort", 10),
@@ -38,6 +39,7 @@ class BattleScreen:
     #        if event.button == 1:
     #            print("Left Mouse Clicked")
 
+
     #def handle_event_print(self, event):
     #    if event.type == pygame.KEYDOWN:
     #        a = pygame.key.name(event.key)
@@ -60,10 +62,16 @@ class BattleScreen:
     def draw(self, screen):
         screen.fill((30, 110, 30))
 
-        # Battlefield Area
-        pygame.draw.rect(screen, (200, 50, 50), self.battlefield_rect) 
+        # Player Battlefield Area
+        pygame.draw.rect(screen, (255, 50, 50), self.player_battlefield_rect) 
         text = self.font.render("Battle Field", True, (255, 255, 255))
-        text_rect = text.get_rect(center=self.battlefield_rect.center)
+        text_rect = text.get_rect(center=self.player_battlefield_rect.center)
+        screen.blit(text, text_rect)
+
+        # Enemy Battlefield Area
+        pygame.draw.rect(screen, (200, 50, 50), self.enemy_battlefield_rect) 
+        text = self.font.render("Battle Field", True, (150, 255, 255))
+        text_rect = text.get_rect(center=self.enemy_battlefield_rect.center)
         screen.blit(text, text_rect)
 
         # Card Area
@@ -91,10 +99,10 @@ class BattleScreen:
         text_rect = text.get_rect(center=self.hand_rect.center)
         screen.blit(text, text_rect)
 
-        # Avatar Area
-        pygame.draw.rect(screen, (0, 100, 100), self.avatar_rect) 
-        text = self.font.render("avatar Field", True, (255, 255, 255))
-        text_rect = text.get_rect(center=self.avatar_rect.center)
+        # Player Hero Area
+        pygame.draw.rect(screen, (0, 100, 100), self.player_hero_rect) 
+        text = self.font.render("Player", True, (255, 255, 255))
+        text_rect = text.get_rect(center=self.player_hero_rect.center)
         screen.blit(text, text_rect)
 
         #title_text = self.font.render("BATTLE SCREEN", True, (255, 255, 255))
