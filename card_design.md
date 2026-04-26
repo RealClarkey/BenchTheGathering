@@ -9,7 +9,7 @@
 
 ----------
 
-Hero Card:
+## Hero Card:
 - Name
 - Hero Type (Fire, Nature, Tech, Neutral)
 - Hit Points
@@ -20,14 +20,18 @@ Hero Card:
 
 ----------
 
-Mana Card:
+## Mana Card:
 - Mana value.
 
 ----------
 
-Skill Cards:
+## Skill Cards:
 - Mana cost.
 - Skill Type (Buff or Instant)
 - Target Type (Self, Ally or Enemy)
 - Duration (Instant, Timed, Permanent (buff) )
 - Effect (ability)
+
+## External Resources:
+- https://game-icons.net/
+- https://graphicriver.net/tcg-graphics-in-game-assets
