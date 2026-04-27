@@ -68,9 +68,9 @@ def build_fan_cards(num_cards, card_width, card_height, screen_width, screen_hei
     cards = []
 
     fan_center_x = screen_width // 2
-    fan_center_y = screen_height + 260
-    radius = 600
-    angle_step = 7
+    fan_center_y = screen_height + 600 #260 default
+    radius = 800 #600
+    angle_step = 7 #7
 
     centre_index = (num_cards - 1) / 2
 
@@ -89,20 +89,22 @@ def build_fan_cards(num_cards, card_width, card_height, screen_width, screen_hei
 def main():
     pygame.init()
 
-    width = 1280
-    height = 720
+    width = 1920
+    height = 1080
     screen = pygame.display.set_mode((width, height))
     pygame.display.set_caption("BenchTheGathering")
 
     clock = pygame.time.Clock()
     button_font = pygame.font.SysFont(None, 36)
 
-    add_button = pygame.Rect(1080, 620, 70, 60)
-    sub_button = pygame.Rect(1160, 620, 70, 60)
+    add_button = pygame.Rect(width-300, 620, 70, 60)
+    sub_button = pygame.Rect(width-200, 620, 70, 60)
 
     num_cards = 3
-    card_width = 128
-    card_height = 180
+    # 0.72 ratio
+    card_ratio = 0.72
+    card_height = 290
+    card_width = card_height * card_ratio
 
     cards = build_fan_cards(num_cards, card_width, card_height, width, height)
 

@@ -30,29 +30,12 @@ class BattleScreen:
         for i, card in enumerate(self.cards):
             card.rect = pygame.Rect(200 + i * 110, 580, 100, 150)
 
-    # 1280 x 720
-    
-    
-
-    #def handle_mouse_click(self, event):
-    #    if event.type == pygame.MOUSEBUTTONDOWN:
-    #        if event.button == 1:
-    #            print("Left Mouse Clicked")
-
-
-    #def handle_event_print(self, event):
-    #    if event.type == pygame.KEYDOWN:
-    #        a = pygame.key.name(event.key)
-    #        print (f"this {a} was clicked")
-
 
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 print("Returning to menu screen")
                 self.game.change_screen("menu")
-        #self.handle_mouse_click(event)
-        #self.handle_event_print(event)
 
     
 
