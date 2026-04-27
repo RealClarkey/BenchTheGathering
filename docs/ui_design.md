@@ -1,104 +1,102 @@
-# Core Game Design Document
+# UI Design Document
 
-## Game Rules
+## Main Battle Screen
 
----
-
-## Deck
-- 20-30 cards per deck
-- No duplicate limit (for now)
+The main screen is divided into the following sections:
 
 ---
 
-## Starting The Game
-- Shuffle Deck
-- Draw 5 cards (minimum 1 hero or re-draw)
-- Choose Player Hero (commander)
-- Player Hero starts on battlefield
+## 1. Opponent Area
+
+Displays:
+- Opponent Hero
+- Opponent HP
+- Number of cards in opponent hand
+
+Notes:
+- Opponent hand is not visible
+- Keep this area simple
 
 ---
 
-## Player Health
-- Player starts with 20HP (via Hero)
+## 2. Enemy Battlefield
+
+Displays:
+- Up to 3 enemy hero cards
+
+Each card shows:
+- Attack
+- Health
+- Type
+- Active effects (later)
+
+Notes:
+- Cards are placed in fixed slots
 
 ---
 
-## Turn Structure
+## 3. Player Battlefield
 
-### Start of Turn
-- Refresh mana
-- Resolve ongoing effects
+Displays:
+- Up to 3 player hero cards
 
-### Draw Phase
-- Draw 1 card
+Each card shows:
+- Attack
+- Health
+- Type
+- Active effects (later)
 
-### Main Phase
-- Play 1 Mana card (optional)
-- Play 1 Hero card OR skill card
-
-### Action Phase
-- Attack with Heroes
-- Use abilities
-
-### End Turn
-- End effects expire
+Notes:
+- Same structure as enemy battlefield
 
 ---
 
-## Battlefield
-- Max 3 Heros active per player
+## 4. Player Area
+
+Displays:
+- Player Hero
+- Player HP
+- Mana (current / max)
+
+Notes:
+- Always visible
 
 ---
 
-## Hand Size
-- Players start with 5 cards
-- Players draw 1 card per turn
-- Maximum hand size is 7
-- If a player draws above 7 cards, excess cards are discarded
+## 5. Player Hand
+
+Displays:
+- Cards currently in hand (max 7)
+
+Behaviour:
+- Cards are arranged in a fan
+- Cards can be clicked and dragged
+- Selected/dragged card is highlighted (https://johnscolaro.xyz/blog/pygame-cards) 
 
 ---
 
-## Mana System (CHOOSE ONE)
+## 6. Controls
 
-### Option A (slightly favouring this atm)
-- Mana cards increase max mana
-- Mana refills each turn
+Displays:
+- End Turn button
 
-### Option B
-- Mana is consumed permanently
-
----
-
-## Combat
-- Heroes attack:
-    - Enemy Heroes
-    - Enemy Player Hero
-- Damage is simultaneous
+Notes:
+- Used to finish the player’s turn
 
 ---
 
-## Type System
-- Fire > Nature
-- Nature > Tech
-- Tech > fire
-- Neutral = no advantage
+## Interaction Summary
+
+- Click and drag a card from the hand
+- Drag the card over a battlefield slot
+- Release to place the card
+- If released outside a valid slot, the card returns to the hand
 
 ---
 
-## Buff & Debuff System
-- Effects can target:
-  - Self
-  - Ally
-  - Enemy
-- Buffs and debuffs shown as icons
+## Future Features (Not required yet)
 
----
-
-## Evolution
-- Heroes evolve after trigger condition
-- Gain stat boosts and/or new abilities
-
---- 
-
-## Win Condition
-- Reduce opponent Hero HP to 0
+- Attack interactions
+- Skill targeting
+- Buff/debuff icons
+- Animations
