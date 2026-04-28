@@ -1,5 +1,6 @@
 import math
 import pygame
+import pygame.gfxdraw
 
 
 MAX_CARDS = 7
@@ -33,35 +34,61 @@ class Card:
                 self.is_returning = False
 
     def draw(self, screen, hovered=False):
-        surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
-
-        pygame.draw.rect(
-            surface,
-            (200, 200, 200),
-            surface.get_rect(),
-            border_radius=10
-        )
-
-        border_colour = (255, 215, 0) if hovered else (0, 0, 0)
-        border_width = 6 if hovered else 3
-
-        pygame.draw.rect(
-            surface,
-            border_colour,
-            surface.get_rect(),
-            border_width,
-            border_radius=10
-        )
-
         draw_pos = self.pos.copy()
 
         if hovered and not self.is_dragging and not self.is_returning:
             draw_pos.y -= 20
 
-        rotated = pygame.transform.rotate(surface, -self.angle)
-        rotated_rect = rotated.get_rect(center=draw_pos)
+        angle_rad = math.radians(self.angle)
 
-        screen.blit(rotated, rotated_rect)
+        half_w = self.width / 2
+        half_h = self.height / 2
+
+        corners = [
+            pygame.Vector2(-half_w, -half_h),
+            pygame.Vector2(half_w, -half_h),
+            pygame.Vector2(half_w, half_h),
+            pygame.Vector2(-half_w, half_h)
+        ]
+
+        rotated_corners = []
+
+        for corner in corners:
+            rotated_x = corner.x * math.cos(angle_rad) - corner.y * math.sin(angle_rad)
+            rotated_y = corner.x * math.sin(angle_rad) + corner.y * math.cos(angle_rad)
+
+            rotated_corners.append((
+                draw_pos.x + rotated_x,
+                draw_pos.y + rotated_y
+            ))
+
+        border_colour = (255, 215, 0) if hovered else (0, 0, 0)
+
+        pygame.gfxdraw.filled_polygon(screen, rotated_corners, border_colour)
+        pygame.gfxdraw.aapolygon(screen, rotated_corners, border_colour)
+
+        inset = 4 if not hovered else 7
+
+        inner_corners = [
+            pygame.Vector2(-half_w + inset, -half_h + inset),
+            pygame.Vector2(half_w - inset, -half_h + inset),
+            pygame.Vector2(half_w - inset, half_h - inset),
+            pygame.Vector2(-half_w + inset, half_h - inset)
+        ]
+
+        inner_rotated_corners = []
+
+        for corner in inner_corners:
+            rotated_x = corner.x * math.cos(angle_rad) - corner.y * math.sin(angle_rad)
+            rotated_y = corner.x * math.sin(angle_rad) + corner.y * math.cos(angle_rad)
+
+            inner_rotated_corners.append((
+                draw_pos.x + rotated_x,
+                draw_pos.y + rotated_y
+            ))
+
+        pygame.gfxdraw.filled_polygon(screen, inner_rotated_corners, (200, 200, 200))
+        pygame.gfxdraw.aapolygon(screen, inner_rotated_corners, (200, 200, 200))
 
 
 def build_fan_cards(num_cards, card_width, card_height, screen_width, screen_height):
