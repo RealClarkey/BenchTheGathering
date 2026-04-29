@@ -127,7 +127,7 @@ def main():
     add_button = pygame.Rect(width-300, 620, 70, 60)
     sub_button = pygame.Rect(width-200, 620, 70, 60)
 
-    num_cards = 3
+    num_cards = 5
     # 0.72 ratio
     card_ratio = 0.72
     card_height = 290
