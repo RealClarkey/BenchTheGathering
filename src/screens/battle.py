@@ -2,6 +2,10 @@ import pygame
 from src.cards.card import Card
 from src.ui.hand_view import HandView
 
+from src.cards.card import Card
+from src.cards.ability import Ability
+from src.cards.buff import Buff
+
 
 class BattleScreen:
     def __init__(self, game):
@@ -9,6 +13,12 @@ class BattleScreen:
         self.font = pygame.font.SysFont(None, 48)
         self.card_font = pygame.font.SysFont(None, 20)
 
+        self.create_layout()
+        self.create_cards()
+
+        self.hand_view = HandView(self.cards, self.hand_rect)
+
+    def create_layout(self):
         #Based on screen resolution 1536(width) x 864(height)
         width = self.game.width
         height = self.game.height
@@ -42,20 +52,25 @@ class BattleScreen:
 
         # Enemy hero area
         self.enemy_hero_rect = pygame.Rect(0, 0, int(width * 0.20), int(width * 0.20))
+    
+    def create_cards(self):
+        fire_blast = Ability(name="Fire Blast", attack_damage=8, mana_cost=3)
+        dark_inferno = Ability( name="Dark Inferno", attack_damage=15, mana_cost=6)
 
-        self.cards = [
-            Card("Voldemort", 10),
-            Card("AM-Wizard", 8),
-            Card("SS-Animal", 11),
-            Card("LC-Elf", 11),
-            Card("JP-Giant", 11),
-            Card("NP-Treeant", 11),
-            Card("KitKat", 9)
-            
-        ]
+        burning = Buff(name="Burning", description="Deals 2 damage per turn")
 
-        self.hand_view = HandView(self.cards, self.hand_rect)
+        voldemort = Card(name="Voldemort", hero_type="Fire", hit_points=30)
 
+        voldemort.abilities.append(fire_blast)
+        voldemort.evolution_abilities.append(dark_inferno)
+        voldemort.buffs.append(burning)
+
+        knight = Card("Knight", "Neutral", 20)
+        elf = Card("Elf", "Nature", 20)
+
+
+
+        self.cards = [voldemort, knight, elf]
 
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN:
@@ -73,50 +88,22 @@ class BattleScreen:
     def draw(self, screen):
         screen.fill((30, 110, 30))
 
-        # Player Battlefield Area
-        pygame.draw.rect(screen, (255, 50, 50), self.player_battlefield_rect) 
-        text = self.font.render("Battle Field", True, (255, 255, 255))
-        text_rect = text.get_rect(center=self.player_battlefield_rect.center)
-        screen.blit(text, text_rect)
-
-        # Enemy Battlefield Area
-        pygame.draw.rect(screen, (200, 50, 50), self.enemy_battlefield_rect) 
-        text = self.font.render("Battle Field", True, (150, 255, 255))
-        text_rect = text.get_rect(center=self.enemy_battlefield_rect.center)
-        screen.blit(text, text_rect)
-
-        # Card Area
-        pygame.draw.rect(screen, (0, 0, 255), self.stats_rect) 
-        text = self.font.render("Current Stats", True, (255, 255, 255))
-        text_rect = text.get_rect(center=self.stats_rect.center)
-        screen.blit(text, text_rect)
-
-        # Next Area
-        pygame.draw.rect(screen, (255, 255, 0), self.next_rect) 
-        text = self.font.render("Next Field", True, (255, 255, 255))
-        text_rect = text.get_rect(center=self.next_rect.center)
-        screen.blit(text, text_rect)
-
-        # Hand Area
-        pygame.draw.rect(screen, (55, 0, 150), self.hand_rect) 
-        text = self.font.render("Hand Field", True, (255, 255, 255))
-        text_rect = text.get_rect(center=self.hand_rect.center)
-        screen.blit(text, text_rect)
-
-        # Player Hero Area
-        pygame.draw.rect(screen, (0, 100, 100), self.player_hero_rect) 
-        text = self.font.render("Player", True, (255, 255, 255))
-        text_rect = text.get_rect(center=self.player_hero_rect.center)
-        screen.blit(text, text_rect)
-
-        # Enemy Hero Area
-        pygame.draw.rect(screen, (255, 100, 100), self.enemy_hero_rect) 
-        text = self.font.render("Enemy", True, (255, 255, 255))
-        text_rect = text.get_rect(center=self.enemy_hero_rect.center)
-        screen.blit(text, text_rect)
+        self.draw_zone(screen, self.enemy_battlefield_rect, (200, 50, 50), "Enemy Battlefield")
+        self.draw_zone(screen, self.player_battlefield_rect, (255, 50, 50), "Player Battlefield")
+        self.draw_zone(screen, self.stats_rect, (0, 0, 255), "Current Stats")
+        self.draw_zone(screen, self.next_rect, (255, 255, 0), "Next", text_colour=(0, 0, 0))
+        self.draw_zone(screen, self.hand_rect, (55, 0, 150), "Hand")
+        self.draw_zone(screen, self.player_hero_rect, (0, 100, 100), "Player Hero")
+        self.draw_zone(screen, self.enemy_hero_rect, (255, 100, 100), "Enemy Hero")
 
         info_text = self.font.render("Press ESC to return to menu", True, (255, 255, 255))
 
         screen.blit(info_text, (330, 350))
 
         self.hand_view.draw(screen)
+
+    def draw_zone(self, screen, rect, colour, label, text_colour=(255, 255, 255)):
+        pygame.draw.rect(screen, colour, rect)
+        text = self.font.render(label, True, text_colour)
+        text_rect = text.get_rect(center=rect.center)
+        screen.blit(text, text_rect)
