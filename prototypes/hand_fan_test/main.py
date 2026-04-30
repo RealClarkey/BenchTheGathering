@@ -112,25 +112,42 @@ def build_fan_cards(num_cards, card_width, card_height, screen_width, screen_hei
 
     return cards
 
-
 def main():
     pygame.init()
 
-    width = 1920
-    height = 1080
+    # Maybe change so it's dynamic?
+    # 1536 x 864 - This is for laptop
+    # 1920x1080 - This is for desktop
+    width = 1536
+    height = 864
     screen = pygame.display.set_mode((width, height))
     pygame.display.set_caption("BenchTheGathering")
 
     clock = pygame.time.Clock()
     button_font = pygame.font.SysFont(None, 36)
 
-    add_button = pygame.Rect(width-300, 620, 70, 60)
-    sub_button = pygame.Rect(width-200, 620, 70, 60)
+    #add_button = pygame.Rect(width-300, 620, 70, 60)
+    #sub_button = pygame.Rect(width-200, 620, 70, 60)
+
+    add_button = pygame.Rect(
+        int(width * 0.805),
+        int(height * 0.72),
+        int(width * 0.045),
+        int(height * 0.069)
+    )
+
+    sub_button = pygame.Rect(
+        int(width * 0.87),
+        int(height * 0.72),
+        int(width * 0.045),
+        int(height * 0.069)
+    )
 
     num_cards = 5
-    # 0.72 ratio
+    screen_card_ratio = 0.336 # ratio of screen height to card height.
+    # 0.72 is the ration between card height and width.
     card_ratio = 0.72
-    card_height = 290
+    card_height = height * screen_card_ratio #290 pixel height of card
     card_width = card_height * card_ratio
 
     cards = build_fan_cards(num_cards, card_width, card_height, width, height)

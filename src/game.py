@@ -9,8 +9,12 @@ class Game:
     def __init__(self):
         pygame.init()
 
-        self.width = 1280
-        self.height = 720
+        #1280 x 720, 1536 x 864
+        self.width = 1536
+        self.height = 864
+
+
+
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("BenchTheGathering")
 

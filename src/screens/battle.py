@@ -8,13 +8,40 @@ class BattleScreen:
         self.font = pygame.font.SysFont(None, 48)
         self.card_font = pygame.font.SysFont(None, 20)
 
-        self.player_battlefield_rect = pygame.Rect(0, 275, 988, 275) # Player Battlefield Area
-        self.enemy_battlefield_rect = pygame.Rect(0, 0, 988, 275) # Enemy Battlefield Area
-        self.card_rect = pygame.Rect(988, 0, 292, 330) # Card Area
-        self.graveyard_rect = pygame.Rect(988, 330, 292, 330) # Graveyard Area
-        self.next_rect = pygame.Rect(988, 660, 292, 60) # Next Area
-        self.hand_rect = pygame.Rect(170, 550, 818, 170) # Hand Area
-        self.player_hero_rect = pygame.Rect(0, 550, 170, 170) # player_hero Area
+        #Based on screen resolution 1536(width) x 864(height)
+        width = self.game.width
+        height = self.game.height
+
+        # Layout uses percentages of screen size so UI scales across resolutions
+        # pygame.Rect format: (x, y, width, height)
+
+        # Player battlefield area
+        self.player_battlefield_rect = pygame.Rect(int(width * 0.20), int(height * 0.34), int(width * 0.60), int(height * 0.34))
+        self.player_battlefield_rect.centerx = width // 2 
+
+        # Enemy battlefield area
+        self.enemy_battlefield_rect = pygame.Rect(int(width * 0.20), 0, int(width * 0.60), int(height * 0.34))
+        self.enemy_battlefield_rect.centerx = width // 2 
+        
+        # Game stats area
+        self.stats_rect = pygame.Rect(0, 0, int(width * 0.20), 330)
+        self.stats_rect.topright = (width, 0)
+        
+        # Next action area
+        self.next_rect = pygame.Rect(int(width * 0.80), int(height * 0.90), int(width * 0.19), int(height * 0.070))
+
+        # Hand area (cards) THIS WILL NEED TO BE LOOKED AT DUE TO MOVING HAND FEATURE OVER
+        self.hand_rect = pygame.Rect(0, 0, int(width * 0.60), int(height * 0.33))
+        self.hand_rect.centerx = width // 2
+        self.hand_rect.bottom = height
+
+        # Player hero area
+        self.player_hero_rect = pygame.Rect(0, 0, int(width * 0.20), int(width * 0.20))
+        self.player_hero_rect.bottom = height
+
+        # Enemy hero area
+        self.enemy_hero_rect = pygame.Rect(0, 0, int(width * 0.20), int(width * 0.20))
+        #self.enemy_hero_rect.topleft = 0
 
         self.cards = [
             Card("Voldemort", 10),
@@ -58,17 +85,10 @@ class BattleScreen:
         screen.blit(text, text_rect)
 
         # Card Area
-        pygame.draw.rect(screen, (0, 0, 255), self.card_rect) 
-        text = self.font.render("Card Field", True, (255, 255, 255))
-        text_rect = text.get_rect(center=self.card_rect.center)
+        pygame.draw.rect(screen, (0, 0, 255), self.stats_rect) 
+        text = self.font.render("Current Stats", True, (255, 255, 255))
+        text_rect = text.get_rect(center=self.stats_rect.center)
         screen.blit(text, text_rect)
-
-        # Graveyard Area
-        pygame.draw.rect(screen, (0, 255, 255), self.graveyard_rect)
-        text = self.font.render("Graveyard Field", True, (255, 255, 255))
-        text_rect = text.get_rect(center=self.graveyard_rect.center)
-        screen.blit(text, text_rect)
-
 
         # Next Area
         pygame.draw.rect(screen, (255, 255, 0), self.next_rect) 
@@ -87,6 +107,13 @@ class BattleScreen:
         text = self.font.render("Player", True, (255, 255, 255))
         text_rect = text.get_rect(center=self.player_hero_rect.center)
         screen.blit(text, text_rect)
+
+        # Enemy Hero Area
+        pygame.draw.rect(screen, (255, 100, 100), self.enemy_hero_rect) 
+        text = self.font.render("Enemy", True, (255, 255, 255))
+        text_rect = text.get_rect(center=self.enemy_hero_rect.center)
+        screen.blit(text, text_rect)
+
 
         #title_text = self.font.render("BATTLE SCREEN", True, (255, 255, 255))
         info_text = self.font.render("Press ESC to return to menu", True, (255, 255, 255))
