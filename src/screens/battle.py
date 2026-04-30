@@ -1,5 +1,6 @@
 import pygame
 from src.cards.card import Card
+from src.ui.hand_view import HandView
 
 
 class BattleScreen:
@@ -41,7 +42,6 @@ class BattleScreen:
 
         # Enemy hero area
         self.enemy_hero_rect = pygame.Rect(0, 0, int(width * 0.20), int(width * 0.20))
-        #self.enemy_hero_rect.topleft = 0
 
         self.cards = [
             Card("Voldemort", 10),
@@ -49,13 +49,12 @@ class BattleScreen:
             Card("SS-Animal", 11),
             Card("LC-Elf", 11),
             Card("JP-Giant", 11),
-            Card("NP-Treant", 11),
+            Card("NP-Treeant", 11),
             Card("KitKat", 9)
             
         ]
 
-        for i, card in enumerate(self.cards):
-            card.rect = pygame.Rect(200 + i * 110, 580, 100, 150)
+        self.hand_view = HandView(self.cards, self.hand_rect)
 
 
     def handle_event(self, event):
@@ -64,10 +63,12 @@ class BattleScreen:
                 print("Returning to menu screen")
                 self.game.change_screen("menu")
 
+        self.hand_view.handle_event(event)
+
     
 
     def update(self):
-        pass
+        self.hand_view.update()
 
     def draw(self, screen):
         screen.fill((30, 110, 30))
@@ -114,17 +115,8 @@ class BattleScreen:
         text_rect = text.get_rect(center=self.enemy_hero_rect.center)
         screen.blit(text, text_rect)
 
-
-        #title_text = self.font.render("BATTLE SCREEN", True, (255, 255, 255))
         info_text = self.font.render("Press ESC to return to menu", True, (255, 255, 255))
 
-        #screen.blit(title_text, (430, 250))
         screen.blit(info_text, (330, 350))
 
-        for card in self.cards:
-            pygame.draw.rect(screen, (220, 220, 220), card.rect)
-            pygame.draw.rect(screen, (0, 0, 0), card.rect, 2)
-
-            name_text = self.card_font.render(card.name, True, (0, 0, 0))
-            name_rect = name_text.get_rect(center=card.rect.center)
-            screen.blit(name_text, name_rect)
+        self.hand_view.draw(screen)
