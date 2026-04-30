@@ -54,6 +54,7 @@ class BattleScreen:
         self.enemy_hero_rect = pygame.Rect(0, 0, int(width * 0.20), int(width * 0.20))
     
     def create_cards(self):
+        # Dummy data for current development.
         fire_blast = Ability(name="Fire Blast", attack_damage=8, mana_cost=3)
         dark_inferno = Ability( name="Dark Inferno", attack_damage=15, mana_cost=6)
 
