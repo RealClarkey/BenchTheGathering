@@ -19,6 +19,7 @@ class BattleScreen:
         self.create_cards()
 
         self.player = Player()
+        self.selected_card = None
 
         self.hand_view = HandView(self.cards, self.hand_rect)
 
@@ -125,17 +126,72 @@ class BattleScreen:
             # reset drop state
             self.hand_view.dropped_card = None
             self.hand_view.drop_position = None
+
+        # Right click
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 3:
+                card = self.get_card_under_mouse()
+
+                if card:
+                    self.selected_card = card
+
+
+    def get_card_under_mouse(self):
+        mouse_pos = pygame.mouse.get_pos()
+
+        for card_view in reversed(self.hand_view.card_views):
+            if card_view.rect().collidepoint(mouse_pos):
+                return card_view.card
+        
+        return None
     
+
+    def draw_card_info(self, screen, card):
+        x = self.stats_rect.x + 10
+        y = self.stats_rect.y + 20
+
+        name_text = self.card_font.render(card.name, True, (255, 255, 255))
+        type_text = self.card_font.render(f"Type: {card.hero_type}", True, (255, 255, 255))
+        hp_text = self.card_font.render(f"HP: {card.hit_points}", True, (255, 255, 255))
+
+        screen.blit(name_text, (x, y))
+        screen.blit(type_text, (x, y + 30))
+        screen.blit(hp_text, (x, y + 60))
+
+        # abilities
+        y_offset = 100
+        for ability in card.abilities:
+            ability_text = self.card_font.render(
+                f"{ability.name} ({ability.mana_cost}) dmg:{ability.attack_damage}",
+                True,
+                (255, 255, 255)
+            )
+            screen.blit(ability_text, (x, y + y_offset))
+            y_offset += 25
+
 
     def update(self):
         self.hand_view.update()
+
+
+
 
     def draw(self, screen):
         screen.fill((30, 110, 30))
 
         self.draw_zone(screen, self.enemy_battlefield_rect, (200, 50, 50), "Enemy Battlefield")
         self.draw_zone(screen, self.player_battlefield_rect, (255, 50, 50), "Player Battlefield")
-        self.draw_zone(screen, self.stats_rect, (0, 0, 255), "Current Stats")
+
+        #Current stats
+        pygame.draw.rect(screen, (0, 0, 255), self.stats_rect)
+
+        if self.selected_card is None:
+            text = self.font.render("Right click a card", True, (255, 255, 255))
+            text_rect = text.get_rect(center=self.stats_rect.center)
+            screen.blit(text, text_rect)
+        else:
+            self.draw_card_info(screen, self.selected_card)
+
         self.draw_zone(screen, self.next_rect, (255, 255, 0), "Next", text_colour=(0, 0, 0))
         self.draw_zone(screen, self.hand_rect, (55, 0, 150), "Hand")
         self.draw_player_hero(screen)
