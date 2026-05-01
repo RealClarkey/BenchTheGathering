@@ -100,6 +100,10 @@ class HandView:
         self.hovered_card = None
         self.dragging_card = None
 
+        # Dropped card mechanics
+        self.dropped_card = None
+        self.drop_position = None
+
         self.font = pygame.font.SysFont(None, 20)
 
         self.build_fan()
@@ -147,6 +151,9 @@ class HandView:
 
         elif event.type == pygame.MOUSEBUTTONUP:
             if event.button == 1 and self.dragging_card is not None:
+                self.dropped_card = self.dragging_card.card
+                self.drop_position = event.pos
+
                 self.dragging_card.is_dragging = False
                 self.dragging_card.is_returning = True
                 self.dragging_card = None

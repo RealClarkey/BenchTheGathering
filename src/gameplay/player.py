@@ -1,0 +1,21 @@
+
+class Player:
+    def __init__(self):
+        self.hero = None
+
+        self.max_hp = 0
+        self.current_hp = 0
+
+        self.max_mana = 0
+        self.current_mana = 0
+    
+    def set_hero(self, card):
+        self.hero = card
+
+        self.max_hp = card.hit_points * 3
+        self.current_hp = self.max_hp
+
+        self.max_mana = 10   # This will later be dynamically set (by buff cards etc)
+        self.current_mana = 0
+
+

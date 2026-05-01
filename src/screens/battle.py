@@ -6,6 +6,8 @@ from src.cards.card import Card
 from src.cards.ability import Ability
 from src.cards.buff import Buff
 
+from src.gameplay.player import Player
+
 
 class BattleScreen:
     def __init__(self, game):
@@ -15,6 +17,8 @@ class BattleScreen:
 
         self.create_layout()
         self.create_cards()
+
+        self.player = Player()
 
         self.hand_view = HandView(self.cards, self.hand_rect)
 
@@ -68,19 +72,59 @@ class BattleScreen:
 
         knight = Card("Knight", "Neutral", 20)
         elf = Card("Elf", "Nature", 20)
+        wizard = Card("Wizard", "Magic", 100)
+        troll = Card("Troll", "Dark", 80)
 
 
 
-        self.cards = [voldemort, knight, elf]
+        self.cards = [voldemort, knight, elf, wizard, troll]
+
+    # Draw player hero from dropped card.
+    def draw_player_hero(self, screen):
+        pygame.draw.rect(screen,(0, 100, 100), self.player_hero_rect)
+
+        if self.player.hero is None:
+            text = self.font.render("Drop Here", True, (255, 255, 255))
+            text_rect = text.get_rect(center=self.player_hero_rect.center)
+            screen.blit(text, text_rect)
+            return
+        
+        name_text = self.card_font.render(self.player.hero.name, True, (255, 255, 255))
+        hp_text = self.card_font.render(f"HP: {self.player.current_hp}/{self.player.max_hp}", True, (255, 255, 255))
+        mana_text = self.card_font.render(f"Mana: {self.player.current_mana}/{self.player.max_mana}", True, (255, 255, 255))
+
+        screen.blit(name_text, (self.player_hero_rect.x + 15, self.player_hero_rect.y + 20))
+        screen.blit(hp_text, (self.player_hero_rect.x + 15, self.player_hero_rect.y + 55))
+        screen.blit(mana_text, (self.player_hero_rect.x + 15, self.player_hero_rect.y + 90))
+
 
     def handle_event(self, event):
+        # ESC handling for current development
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 print("Returning to menu screen")
                 self.game.change_screen("menu")
 
+        # Let HandView process drag/drop first
         self.hand_view.handle_event(event)
 
+        # Handles the result of the drop
+        if self.hand_view.dropped_card:
+            dropped_card = self.hand_view.dropped_card
+            drop_pos = self.hand_view.drop_position
+
+            if self.player_hero_rect.collidepoint(drop_pos):
+                # Condition to only allow if no player hero selected
+                if self.player.hero is None:
+                    self.player.set_hero(dropped_card)
+                    self.cards.remove(dropped_card)
+                    self.hand_view.build_fan()
+                else:
+                    print("Hero already exists") # change this later to a ui pop up messaged
+
+            # reset drop state
+            self.hand_view.dropped_card = None
+            self.hand_view.drop_position = None
     
 
     def update(self):
@@ -94,7 +138,7 @@ class BattleScreen:
         self.draw_zone(screen, self.stats_rect, (0, 0, 255), "Current Stats")
         self.draw_zone(screen, self.next_rect, (255, 255, 0), "Next", text_colour=(0, 0, 0))
         self.draw_zone(screen, self.hand_rect, (55, 0, 150), "Hand")
-        self.draw_zone(screen, self.player_hero_rect, (0, 100, 100), "Player Hero")
+        self.draw_player_hero(screen)
         self.draw_zone(screen, self.enemy_hero_rect, (255, 100, 100), "Enemy Hero")
 
         info_text = self.font.render("Press ESC to return to menu", True, (255, 255, 255))
