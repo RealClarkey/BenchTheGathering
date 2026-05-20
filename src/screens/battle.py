@@ -19,6 +19,8 @@ class BattleScreen:
         self.create_cards()
 
         self.player = Player()
+        self.max_battlefield_cards = 3
+        self.player_battlefield_cards = []
         self.selected_card = None
 
         self.hand_view = HandView(self.cards, self.hand_rect)
@@ -34,6 +36,26 @@ class BattleScreen:
         # Player battlefield area
         self.player_battlefield_rect = pygame.Rect(int(width * 0.20), int(height * 0.34), int(width * 0.60), int(height * 0.34))
         self.player_battlefield_rect.centerx = width // 2 
+
+        slot_width = int(self.player_battlefield_rect.width * 0.25)
+        slot_height = int(self.player_battlefield_rect.height * 0.75)
+        slot_gap = int(self.player_battlefield_rect.width * 0.05)
+
+        total_width = (slot_width * 3) + (slot_gap * 2)
+        start_x = self.player_battlefield_rect.centerx - total_width // 2
+        slot_y = self.player_battlefield_rect.centery - slot_height // 2
+
+        self.player_battlefield_slots = []
+
+        for i in range(3):
+            slot_rect = pygame.Rect(
+                start_x + i * (slot_width + slot_gap),
+                slot_y,
+                slot_width,
+                slot_height
+            )
+            self.player_battlefield_slots.append(slot_rect)
+
 
         # Enemy battlefield area
         self.enemy_battlefield_rect = pygame.Rect(int(width * 0.20), 0, int(width * 0.60), int(height * 0.34))
@@ -122,6 +144,16 @@ class BattleScreen:
                     self.hand_view.build_fan()
                 else:
                     print("Hero already exists") # change this later to a ui pop up messaged
+            else:
+                for slot in self.player_battlefield_slots:
+                    if slot.collidepoint(drop_pos):
+                        if len(self.player_battlefield_cards) < self.max_battlefield_cards:
+                            self.player_battlefield_cards.append(dropped_card)
+                            self.cards.remove(dropped_card)
+                            self.hand_view.build_fan()
+                        else:
+                            print("Battlefield is full") # replace with ui
+                        break
 
             # reset drop state
             self.hand_view.dropped_card = None
@@ -142,9 +174,37 @@ class BattleScreen:
         for card_view in reversed(self.hand_view.card_views):
             if card_view.rect().collidepoint(mouse_pos):
                 return card_view.card
+            
+        for i, card in enumerate(self.player_battlefield_cards):
+            slot = self.player_battlefield_slots[i]
+
+            card_rect = pygame.Rect(0, 0, int(slot.width * 0.75), int(slot.height * 0.85))
+            card_rect.center = slot.center
+
+            if card_rect.collidepoint(mouse_pos):
+                return card
         
         return None
     
+    def draw_player_battlefield_slots(self, screen):
+        for slot in self.player_battlefield_slots:
+            pygame.draw.rect(screen, (120, 20, 20), slot)
+            pygame.draw.rect(screen, (255, 255, 255), slot, 2)
+    
+    def draw_player_battlefield_cards(self, screen):
+        for i, card in enumerate(self.player_battlefield_cards):
+            slot = self.player_battlefield_slots[i]
+
+            rect = pygame.Rect(0, 0, int(slot.width * 0.75), int(slot.height * 0.85))
+            rect.center = slot.center
+
+            pygame.draw.rect(screen, (220, 220, 220), rect)
+            pygame.draw.rect(screen, (0, 0, 0), rect, 2)
+
+            name_text = self.card_font.render(card.name, True, (0, 0, 0))
+            name_rect = name_text.get_rect(center=rect.center)
+            screen.blit(name_text, name_rect)
+            
 
     def draw_card_info(self, screen, card):
         x = self.stats_rect.x + 10
@@ -181,6 +241,8 @@ class BattleScreen:
 
         self.draw_zone(screen, self.enemy_battlefield_rect, (200, 50, 50), "Enemy Battlefield")
         self.draw_zone(screen, self.player_battlefield_rect, (255, 50, 50), "Player Battlefield")
+        self.draw_player_battlefield_slots(screen)
+        self.draw_player_battlefield_cards(screen)
 
         #Current stats
         pygame.draw.rect(screen, (0, 0, 255), self.stats_rect)

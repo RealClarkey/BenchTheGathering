@@ -78,9 +78,9 @@
 ---
 
 ## Type System
-- Fire > Nature
+- Magic > Nature
 - Nature > Tech
-- Tech > fire
+- Tech > Magic
 - Neutral = no advantage
 
 ---
