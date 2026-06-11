@@ -31,6 +31,17 @@ def test_hand_discards_excess_cards_over_max_size():
     assert discarded_cards == ["D"]
 
 
+def test_hand_keeps_same_card_list_when_discarding_excess():
+    hand = Hand(["A", "B"], max_size=3)
+    displayed_cards = hand.cards
+
+    discarded_cards = hand.add_cards(["C", "D"])
+
+    assert displayed_cards is hand.cards
+    assert displayed_cards == ["A", "B", "C"]
+    assert discarded_cards == ["D"]
+
+
 def test_battle_state_draws_starting_hand_after_hero_selection():
     commander = Card("Commander", "Dark", 30)
     deck_cards = [

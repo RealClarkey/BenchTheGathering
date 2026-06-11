@@ -12,7 +12,7 @@ class Hand:
             return []
 
         excess_cards = self.cards[self.max_size:]
-        self.cards = self.cards[:self.max_size]
+        del self.cards[self.max_size:]
         return excess_cards
 
     def remove(self, card):
