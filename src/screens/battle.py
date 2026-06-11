@@ -209,7 +209,7 @@ class BattleScreen:
         result = self.battle_state.attack(self.selected_attacker, target)
 
         if result.success:
-            self.set_status_message(f"{self.selected_attacker.name} dealt {result.damage} damage")
+            self.set_status_message(f"{self.selected_attacker.name} spent 1 mana and dealt {result.damage} damage")
             self.selected_attacker = None
         elif result.message:
             self.set_status_message(result.message)
@@ -329,10 +329,12 @@ class BattleScreen:
         name_text = self.card_font.render(card.name, True, (0, 0, 0))
         hp_text = self.card_font.render(f"HP: {card.current_hit_points}/{card.hit_points}", True, (0, 0, 0))
         attack_text = self.card_font.render(f"ATK: {card.attack}", True, (0, 0, 0))
+        cost_text = self.card_font.render("Cost: 1", True, (0, 0, 0))
 
         screen.blit(name_text, (rect.x + 8, rect.y + 18))
         screen.blit(hp_text, (rect.x + 8, rect.y + 48))
         screen.blit(attack_text, (rect.x + 8, rect.y + 78))
+        screen.blit(cost_text, (rect.x + 8, rect.y + 108))
             
 
     def draw_card_info(self, screen, card):

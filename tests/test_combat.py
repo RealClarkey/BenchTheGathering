@@ -29,6 +29,37 @@ def test_attack_damages_enemy_battlefield_hero():
     assert result.success
     assert result.damage == 5
     assert target.current_hit_points == 5
+    assert battle_state.player.current_mana == 0
+
+
+def test_attack_requires_one_mana():
+    attacker = Card("Attacker", "Dark", 10, attack=4)
+    target = Card("Target", "Nature", 10)
+    battle_state = BattleState(Card("Commander", "Dark", 30), [], starting_hand_size=0)
+    battle_state.player.current_mana = 0
+    battle_state.player_board.add_hero(attacker)
+    battle_state.enemy_board.add_hero(target)
+    advance_to_action_phase(battle_state)
+
+    result = battle_state.attack(attacker, target)
+
+    assert not result.success
+    assert result.message == "Not enough mana to attack"
+    assert target.current_hit_points == 10
+
+
+def test_attack_does_not_spend_mana_when_not_action_phase():
+    attacker = Card("Attacker", "Dark", 10, attack=4)
+    target = Card("Target", "Nature", 10)
+    battle_state = BattleState(Card("Commander", "Dark", 30), [], starting_hand_size=0)
+    battle_state.player.current_mana = 1
+    battle_state.player_board.add_hero(attacker)
+    battle_state.enemy_board.add_hero(target)
+
+    result = battle_state.attack(attacker, target)
+
+    assert not result.success
+    assert battle_state.player.current_mana == 1
 
 
 def test_attack_removes_defeated_enemy_battlefield_hero():

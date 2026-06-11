@@ -83,6 +83,7 @@
 - Damage is simultaneous
 - Current prototype uses a default enemy commander and battlefield before AI exists
 - Attacks are only allowed during the Action Phase
+- Attacks cost 1 mana
 - Each hero can attack once per turn
 - Defeated enemy battlefield heroes are removed from battle
 

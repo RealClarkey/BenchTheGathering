@@ -62,6 +62,7 @@ class BattleState:
         self.has_played_mana_this_turn = False
         self.has_played_main_card_this_turn = False
         self.attackers_this_turn = set()
+        self.attack_mana_cost = 1
         self.starting_hand_size = starting_hand_size
         self.shuffle_deck = shuffle_deck
         self.has_used_mulligan = False
@@ -177,6 +178,11 @@ class BattleState:
 
         if target not in valid_targets:
             return CombatResult(False, "Target must be an enemy hero")
+
+        if self.player.current_mana < self.attack_mana_cost:
+            return CombatResult(False, "Not enough mana to attack")
+
+        self.player.current_mana -= self.attack_mana_cost
 
         damage = self.calculate_damage(attacker, target)
         target.current_hit_points -= damage
