@@ -140,6 +140,67 @@ def test_mulligan_only_allowed_before_first_phase_advance():
     assert result.message == "Mulligan only available at game start"
 
 
+def test_mulligan_not_available_after_playing_mana_card():
+    commander = Card("Commander", "Dark", 30)
+    mana_card = Card("Mana", "Neutral", 0, card_type="Mana", mana_value=1)
+    battle_state = BattleState(
+        commander,
+        [mana_card],
+        starting_hand_size=1,
+        shuffle_deck=False,
+    )
+
+    battle_state.play_mana_card(mana_card)
+    result = battle_state.mulligan()
+
+    assert not result.success
+    assert result.message == "Mulligan only available before playing a card"
+
+
+def test_mulligan_not_available_after_playing_hero_card():
+    commander = Card("Commander", "Dark", 30)
+    hero_card = Card("Hero", "Nature", 10)
+    battle_state = BattleState(
+        commander,
+        [hero_card],
+        starting_hand_size=1,
+        shuffle_deck=False,
+    )
+
+    battle_state.play_card_to_player_battlefield(hero_card)
+    result = battle_state.mulligan()
+
+    assert not result.success
+    assert result.message == "Mulligan only available before playing a card"
+
+
+def test_mulligan_not_available_after_playing_skill_card():
+    commander = Card("Commander", "Dark", 30)
+    hero_card = Card("Hero", "Nature", 10)
+    skill_card = Card(
+        "Training",
+        "Neutral",
+        0,
+        card_type="Skill",
+        effect="buff_attack",
+        attack_bonus=1,
+        mana_cost=1,
+    )
+    battle_state = BattleState(
+        commander,
+        [hero_card, skill_card],
+        starting_hand_size=2,
+        shuffle_deck=False,
+    )
+    battle_state.player_board.add_hero(hero_card)
+
+    battle_state.play_skill_card(skill_card, hero_card)
+    result = battle_state.mulligan()
+
+    assert not result.success
+    assert result.message == "Mulligan only available before playing a card"
+
+
 def test_mulligan_keeps_a_hero_in_starting_hand_when_possible():
     commander = Card("Commander", "Dark", 30)
     mana_card = Card("Mana", "Neutral", 0, card_type="Mana")

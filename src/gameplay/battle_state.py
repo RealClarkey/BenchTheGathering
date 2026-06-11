@@ -47,6 +47,7 @@ class BattleState:
         self.starting_hand_size = starting_hand_size
         self.shuffle_deck = shuffle_deck
         self.has_used_mulligan = False
+        self.has_played_card_this_game = False
 
         self.draw_starting_hand(starting_hand_size)
 
@@ -82,6 +83,9 @@ class BattleState:
 
         if self.turn_manager.turn_number != 1 or self.turn_manager.current_phase != "start":
             return PlayResult(False, "Mulligan only available at game start")
+
+        if self.has_played_card_this_game:
+            return PlayResult(False, "Mulligan only available before playing a card")
 
         self.player_deck.cards.extend(self.player_hand.cards)
         self.player_hand.cards.clear()
@@ -137,6 +141,7 @@ class BattleState:
         self.player.max_mana += card.mana_value
         self.player.current_mana += card.mana_value
         self.has_played_mana_this_turn = True
+        self.has_played_card_this_game = True
         self.player_hand.remove(card)
         self.player_discard_pile.append(card)
 
@@ -166,6 +171,7 @@ class BattleState:
         self.player_hand.remove(card)
         self.player_discard_pile.append(card)
         self.has_played_main_card_this_turn = True
+        self.has_played_card_this_game = True
 
         return PlayResult(True)
 
@@ -185,4 +191,5 @@ class BattleState:
         self.player_hand.remove(card)
         self.player_board.add_hero(card)
         self.has_played_main_card_this_turn = True
+        self.has_played_card_this_game = True
         return PlayResult(True)
