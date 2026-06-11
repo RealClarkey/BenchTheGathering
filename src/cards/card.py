@@ -1,8 +1,9 @@
 
 
 class Card:
-    def __init__(self, name, hero_type, hit_points):
+    def __init__(self, name, hero_type, hit_points, card_type="Hero"):
         self.name = name
+        self.card_type = card_type
         self.hero_type = hero_type
         self.hit_points = hit_points
 
@@ -15,6 +16,7 @@ class Card:
 '''
 ## Hero Card:
 - Name
+- Card Type (Hero)
 - Hero Type (Dark, Nature, Tech, Neutral)
 - Hit Points
 - Pic (Image)

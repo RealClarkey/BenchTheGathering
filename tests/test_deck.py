@@ -87,3 +87,36 @@ def test_demo_deck_uses_target_size_and_excludes_commander():
 
     assert len(deck) == 30
     assert commander.name not in [card.name for card in deck]
+
+
+def test_cards_can_store_card_type():
+    hero = Card("Hero", "Dark", 30, card_type="Hero")
+    mana = Card("Mana", "Neutral", 0, card_type="Mana")
+    skill = Card("Skill", "Neutral", 0, card_type="Skill")
+
+    assert hero.card_type == "Hero"
+    assert mana.card_type == "Mana"
+    assert skill.card_type == "Skill"
+
+
+def test_cards_default_to_hero_type_for_existing_card_data():
+    card = Card("Hero", "Dark", 30)
+
+    assert card.card_type == "Hero"
+
+
+def test_only_hero_cards_can_be_played_to_battlefield():
+    commander = Card("Commander", "Dark", 30)
+    mana_card = Card("Mana", "Neutral", 0, card_type="Mana")
+    battle_state = BattleState(
+        commander,
+        [mana_card],
+        starting_hand_size=1,
+    )
+
+    result = battle_state.play_card_to_player_battlefield(mana_card)
+
+    assert not result.success
+    assert result.message == "Only hero cards can be played to the battlefield"
+    assert mana_card in battle_state.player_hand.cards
+    assert mana_card not in battle_state.player_board.active_heroes

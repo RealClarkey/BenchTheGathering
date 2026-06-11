@@ -45,6 +45,9 @@ class BattleState:
         if card not in self.player_hand.cards:
             return PlayResult(False, "Card is not in hand")
 
+        if card.card_type != "Hero":
+            return PlayResult(False, "Only hero cards can be played to the battlefield")
+
         if not self.player_board.can_add_hero():
             return PlayResult(False, "Battlefield is full")
 
