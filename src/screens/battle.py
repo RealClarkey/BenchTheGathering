@@ -79,20 +79,20 @@ class BattleScreen:
     
     def create_cards(self):
         # Dummy data for current development.
-        fire_blast = Ability(name="Fire Blast", attack_damage=8, mana_cost=3)
+        shadow_bolt = Ability(name="Shadow Bolt", attack_damage=8, mana_cost=3)
         dark_inferno = Ability( name="Dark Inferno", attack_damage=15, mana_cost=6)
 
         burning = Buff(name="Burning", description="Deals 2 damage per turn")
 
-        voldemort = Card(name="Voldemort", hero_type="Fire", hit_points=30)
+        voldemort = Card(name="Voldemort", hero_type="Dark", hit_points=30)
 
-        voldemort.abilities.append(fire_blast)
+        voldemort.abilities.append(shadow_bolt)
         voldemort.evolution_abilities.append(dark_inferno)
         voldemort.buffs.append(burning)
 
         knight = Card("Knight", "Neutral", 20)
         elf = Card("Elf", "Nature", 20)
-        wizard = Card("Wizard", "Magic", 100)
+        wizard = Card("Wizard", "Tech", 100)
         troll = Card("Troll", "Dark", 80)
 
 

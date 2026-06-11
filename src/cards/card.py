@@ -15,7 +15,7 @@ class Card:
 '''
 ## Hero Card:
 - Name
-- Hero Type (Fire, Nature, Tech, Neutral)
+- Hero Type (Dark, Nature, Tech, Neutral)
 - Hit Points
 - Pic (Image)
 - Buffs (Icons)

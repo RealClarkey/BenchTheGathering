@@ -7,19 +7,22 @@
 ## Deck
 - 20-30 cards per deck
 - No duplicate limit (for now)
+- Deck contains cards used during the match, excluding the chosen player hero
 
 ---
 
 ## Starting The Game
-- Shuffle Deck
-- Draw 5 cards (minimum 1 hero or re-draw)
-- Choose Player Hero (commander)
+- Choose Player Hero before the match starts
+- Player Hero is selected from available hero cards, not drawn randomly
 - Player Hero starts on battlefield
+- Shuffle Deck
+- Draw starting hand
 
 ---
 
 ## Player Health
-- Player starts with 20HP (via Hero)
+- Player HP is equal to the selected Player Hero's HP
+- If the Player Hero reaches 0 HP, that player loses
 
 ---
 
@@ -46,26 +49,24 @@
 ---
 
 ## Battlefield
-- Max 3 Heros active per player
+- Max 3 Heroes active per player
 
 ---
 
 ## Hand Size
-- Players start with 5 cards
+- Starting hand size is still undecided
+- Starting hand can be higher than 7 if testing shows the game needs it
 - Players draw 1 card per turn
 - Maximum hand size is 7
 - If a player draws above 7 cards, excess cards are discarded
 
 ---
 
-## Mana System (CHOOSE ONE)
-
-### Option A (slightly favouring this atm)
+## Mana System
 - Mana cards increase max mana
 - Mana refills each turn
-
-### Option B
-- Mana is consumed permanently
+- Current mana cannot exceed max mana
+- Playing mana cards is required to increase max mana
 
 ---
 
@@ -78,9 +79,9 @@
 ---
 
 ## Type System
-- Magic > Nature
+- Dark > Nature
 - Nature > Tech
-- Tech > Magic
+- Tech > Dark
 - Neutral = no advantage
 
 ---

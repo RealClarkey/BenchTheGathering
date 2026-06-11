@@ -7,11 +7,17 @@
 - Mana
 - Skill
 
+## Hero Types:
+- Dark
+- Nature
+- Tech
+- Neutral
+
 ----------
 
 ## Hero Card:
 - Name
-- Hero Type (Dark, Nature, Tech, Neutral)
+- Hero Type
 - Hit Points
 - Pic (Image)
 - Buffs (Icons)
@@ -21,7 +27,9 @@
 ----------
 
 ## Mana Card:
-- Mana value.
+- Mana value
+- Increases max mana when played
+- Mana refills to max at the start of each turn
 
 ----------
 
