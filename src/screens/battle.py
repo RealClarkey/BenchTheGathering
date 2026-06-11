@@ -1,12 +1,11 @@
 import pygame
-from src.cards.card import Card
 from src.ui.hand_view import HandView
 
 from src.cards.card import Card
 from src.cards.ability import Ability
 from src.cards.buff import Buff
 
-from src.gameplay.player import Player
+from src.gameplay.battle_state import BattleState
 
 
 class BattleScreen:
@@ -16,14 +15,12 @@ class BattleScreen:
         self.card_font = pygame.font.SysFont(None, 20)
 
         self.create_layout()
-        self.create_cards()
+        starting_hand = self.create_cards()
 
-        self.player = Player()
-        self.max_battlefield_cards = 3
-        self.player_battlefield_cards = []
+        self.battle_state = BattleState(starting_hand)
         self.selected_card = None
 
-        self.hand_view = HandView(self.cards, self.hand_rect)
+        self.hand_view = HandView(self.battle_state.player_hand.cards, self.hand_rect)
 
     def create_layout(self):
         #Based on screen resolution 1536(width) x 864(height)
@@ -100,21 +97,23 @@ class BattleScreen:
 
 
 
-        self.cards = [voldemort, knight, elf, wizard, troll]
+        return [voldemort, knight, elf, wizard, troll]
 
     # Draw player hero from dropped card.
     def draw_player_hero(self, screen):
         pygame.draw.rect(screen,(0, 100, 100), self.player_hero_rect)
 
-        if self.player.hero is None:
+        player = self.battle_state.player
+
+        if player.hero is None:
             text = self.font.render("Drop Here", True, (255, 255, 255))
             text_rect = text.get_rect(center=self.player_hero_rect.center)
             screen.blit(text, text_rect)
             return
         
-        name_text = self.card_font.render(self.player.hero.name, True, (255, 255, 255))
-        hp_text = self.card_font.render(f"HP: {self.player.current_hp}/{self.player.max_hp}", True, (255, 255, 255))
-        mana_text = self.card_font.render(f"Mana: {self.player.current_mana}/{self.player.max_mana}", True, (255, 255, 255))
+        name_text = self.card_font.render(player.hero.name, True, (255, 255, 255))
+        hp_text = self.card_font.render(f"HP: {player.current_hp}/{player.max_hp}", True, (255, 255, 255))
+        mana_text = self.card_font.render(f"Mana: {player.current_mana}/{player.max_mana}", True, (255, 255, 255))
 
         screen.blit(name_text, (self.player_hero_rect.x + 15, self.player_hero_rect.y + 20))
         screen.blit(hp_text, (self.player_hero_rect.x + 15, self.player_hero_rect.y + 55))
@@ -137,22 +136,13 @@ class BattleScreen:
             drop_pos = self.hand_view.drop_position
 
             if self.player_hero_rect.collidepoint(drop_pos):
-                # Condition to only allow if no player hero selected
-                if self.player.hero is None:
-                    self.player.set_hero(dropped_card)
-                    self.cards.remove(dropped_card)
-                    self.hand_view.build_fan()
-                else:
-                    print("Hero already exists") # change this later to a ui pop up messaged
+                result = self.battle_state.choose_player_hero(dropped_card)
+                self.handle_play_result(result)
             else:
                 for slot in self.player_battlefield_slots:
                     if slot.collidepoint(drop_pos):
-                        if len(self.player_battlefield_cards) < self.max_battlefield_cards:
-                            self.player_battlefield_cards.append(dropped_card)
-                            self.cards.remove(dropped_card)
-                            self.hand_view.build_fan()
-                        else:
-                            print("Battlefield is full") # replace with ui
+                        result = self.battle_state.play_card_to_player_battlefield(dropped_card)
+                        self.handle_play_result(result)
                         break
 
             # reset drop state
@@ -167,6 +157,11 @@ class BattleScreen:
                 if card:
                     self.selected_card = card
 
+    def handle_play_result(self, result):
+        if result.success:
+            self.hand_view.build_fan()
+        elif result.message:
+            print(result.message) # Replace with UI feedback later.
 
     def get_card_under_mouse(self):
         mouse_pos = pygame.mouse.get_pos()
@@ -175,7 +170,7 @@ class BattleScreen:
             if card_view.rect().collidepoint(mouse_pos):
                 return card_view.card
             
-        for i, card in enumerate(self.player_battlefield_cards):
+        for i, card in enumerate(self.battle_state.player_board.active_heroes):
             slot = self.player_battlefield_slots[i]
 
             card_rect = pygame.Rect(0, 0, int(slot.width * 0.75), int(slot.height * 0.85))
@@ -192,7 +187,7 @@ class BattleScreen:
             pygame.draw.rect(screen, (255, 255, 255), slot, 2)
     
     def draw_player_battlefield_cards(self, screen):
-        for i, card in enumerate(self.player_battlefield_cards):
+        for i, card in enumerate(self.battle_state.player_board.active_heroes):
             slot = self.player_battlefield_slots[i]
 
             rect = pygame.Rect(0, 0, int(slot.width * 0.75), int(slot.height * 0.85))
