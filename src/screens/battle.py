@@ -64,6 +64,9 @@ class BattleScreen:
         # Next action area
         self.next_rect = pygame.Rect(int(width * 0.80), int(height * 0.90), int(width * 0.19), int(height * 0.070))
 
+        # Mulligan area
+        self.mulligan_rect = pygame.Rect(int(width * 0.80), int(height * 0.81), int(width * 0.19), int(height * 0.070))
+
         # Hand area (cards) THIS WILL NEED TO BE LOOKED AT DUE TO MOVING HAND FEATURE OVER
         self.hand_rect = pygame.Rect(0, 0, int(width * 0.60), int(height * 0.33))
         self.hand_rect.centerx = width // 2
@@ -112,6 +115,10 @@ class BattleScreen:
 
                 if result is not None:
                     self.handle_draw_result(result)
+
+            if event.button == 1 and self.mulligan_rect.collidepoint(event.pos):
+                result = self.battle_state.mulligan()
+                self.handle_mulligan_result(result)
 
         # Let HandView process drag/drop first
         self.hand_view.handle_event(event)
@@ -178,6 +185,13 @@ class BattleScreen:
             self.set_status_message("Hand is full. Excess drawn cards were discarded.")
         else:
             self.set_status_message("Drew 1 card")
+
+    def handle_mulligan_result(self, result):
+        if result.success:
+            self.hand_view.build_fan()
+
+        if result.message:
+            self.set_status_message(result.message)
 
     def get_card_under_mouse(self):
         mouse_pos = pygame.mouse.get_pos()
@@ -307,6 +321,7 @@ class BattleScreen:
 
         self.draw_deck_info(screen)
 
+        self.draw_zone(screen, self.mulligan_rect, (230, 230, 230), "Mulligan", text_colour=(0, 0, 0))
         self.draw_zone(screen, self.next_rect, (255, 255, 0), "Next Phase", text_colour=(0, 0, 0))
         self.draw_zone(screen, self.hand_rect, (55, 0, 150), "Hand")
         self.draw_player_hero(screen)

@@ -18,6 +18,8 @@
 - Player Hero starts on battlefield
 - Shuffle Deck
 - Draw 7 cards
+- Player may take 1 Mulligan before advancing to the first Draw Phase
+- Mulligan shuffles the opening hand back into the deck and draws a new 7-card hand
 
 ---
 

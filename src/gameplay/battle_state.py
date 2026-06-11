@@ -44,6 +44,9 @@ class BattleState:
         self.resolved_phase_key = None
         self.has_played_mana_this_turn = False
         self.has_played_main_card_this_turn = False
+        self.starting_hand_size = starting_hand_size
+        self.shuffle_deck = shuffle_deck
+        self.has_used_mulligan = False
 
         self.draw_starting_hand(starting_hand_size)
 
@@ -72,6 +75,26 @@ class BattleState:
     def advance_phase(self):
         self.turn_manager.advance_phase()
         return self.resolve_current_phase()
+
+    def mulligan(self):
+        if self.has_used_mulligan:
+            return PlayResult(False, "Mulligan already used")
+
+        if self.turn_manager.turn_number != 1 or self.turn_manager.current_phase != "start":
+            return PlayResult(False, "Mulligan only available at game start")
+
+        self.player_deck.cards.extend(self.player_hand.cards)
+        self.player_hand.cards.clear()
+
+        if self.shuffle_deck:
+            self.player_deck.shuffle()
+        else:
+            self.player_deck.cards.reverse()
+
+        self.draw_starting_hand(self.starting_hand_size)
+        self.has_used_mulligan = True
+
+        return PlayResult(True, "Mulligan used")
 
     def draw_starting_hand(self, amount):
         result = self.draw_cards(amount)

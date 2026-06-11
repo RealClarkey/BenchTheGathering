@@ -75,6 +75,88 @@ def test_battle_state_starting_hand_includes_hero_when_deck_has_one():
     assert len(battle_state.player_hand) == 2
 
 
+def test_mulligan_redraws_starting_hand_once_at_game_start():
+    commander = Card("Commander", "Dark", 30)
+    first_card = Card("First", "Nature", 10)
+    second_card = Card("Second", "Tech", 10)
+    third_card = Card("Third", "Dark", 10)
+    fourth_card = Card("Fourth", "Neutral", 10)
+    battle_state = BattleState(
+        commander,
+        [first_card, second_card, third_card, fourth_card],
+        starting_hand_size=2,
+        shuffle_deck=False,
+    )
+
+    result = battle_state.mulligan()
+
+    assert result.success
+    assert battle_state.has_used_mulligan
+    assert len(battle_state.player_hand) == 2
+    assert battle_state.player_hand.cards != [first_card, second_card]
+
+
+def test_mulligan_can_only_be_used_once():
+    commander = Card("Commander", "Dark", 30)
+    deck_cards = [
+        Card("First", "Nature", 10),
+        Card("Second", "Tech", 10),
+        Card("Third", "Dark", 10),
+        Card("Fourth", "Neutral", 10),
+    ]
+    battle_state = BattleState(
+        commander,
+        deck_cards,
+        starting_hand_size=2,
+        shuffle_deck=False,
+    )
+
+    first_result = battle_state.mulligan()
+    second_result = battle_state.mulligan()
+
+    assert first_result.success
+    assert not second_result.success
+    assert second_result.message == "Mulligan already used"
+
+
+def test_mulligan_only_allowed_before_first_phase_advance():
+    commander = Card("Commander", "Dark", 30)
+    deck_cards = [
+        Card("First", "Nature", 10),
+        Card("Second", "Tech", 10),
+        Card("Third", "Dark", 10),
+    ]
+    battle_state = BattleState(
+        commander,
+        deck_cards,
+        starting_hand_size=2,
+        shuffle_deck=False,
+    )
+
+    battle_state.advance_phase()
+    result = battle_state.mulligan()
+
+    assert not result.success
+    assert result.message == "Mulligan only available at game start"
+
+
+def test_mulligan_keeps_a_hero_in_starting_hand_when_possible():
+    commander = Card("Commander", "Dark", 30)
+    mana_card = Card("Mana", "Neutral", 0, card_type="Mana")
+    skill_card = Card("Skill", "Neutral", 0, card_type="Skill")
+    hero_card = Card("Hero", "Nature", 10)
+    battle_state = BattleState(
+        commander,
+        [mana_card, skill_card, hero_card],
+        starting_hand_size=2,
+        shuffle_deck=False,
+    )
+
+    battle_state.mulligan()
+
+    assert any(card.card_type == "Hero" for card in battle_state.player_hand.cards)
+
+
 def test_battle_state_discards_drawn_cards_when_hand_is_full():
     commander = Card("Commander", "Dark", 30)
     deck_cards = [
