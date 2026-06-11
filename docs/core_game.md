@@ -81,6 +81,10 @@
     - Enemy Heroes
     - Enemy Player Hero
 - Damage is simultaneous
+- Current prototype uses a default enemy commander and battlefield before AI exists
+- Attacks are only allowed during the Action Phase
+- Each hero can attack once per turn
+- Defeated enemy battlefield heroes are removed from battle
 
 ---
 

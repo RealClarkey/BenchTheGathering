@@ -1,7 +1,7 @@
 import pygame
 from src.ui.hand_view import HandView
 
-from src.cards.card_catalog import create_demo_deck
+from src.cards.card_catalog import create_default_enemy_setup, create_demo_deck
 from src.gameplay.battle_state import BattleState, PlayResult
 
 
@@ -14,9 +14,17 @@ class BattleScreen:
         self.create_layout()
         player_hero = self.game.selected_commander
         deck_cards = create_demo_deck(player_hero)
+        enemy_hero, enemy_board_cards = create_default_enemy_setup()
 
-        self.battle_state = BattleState(player_hero, deck_cards, starting_hand_size=7)
+        self.battle_state = BattleState(
+            player_hero,
+            deck_cards,
+            starting_hand_size=7,
+            enemy_hero=enemy_hero,
+            enemy_board_cards=enemy_board_cards,
+        )
         self.selected_card = None
+        self.selected_attacker = None
         self.status_message = "Choose cards to play"
 
         self.hand_view = HandView(self.battle_state.player_hand.cards, self.hand_rect)
@@ -56,6 +64,25 @@ class BattleScreen:
         # Enemy battlefield area
         self.enemy_battlefield_rect = pygame.Rect(int(width * 0.20), 0, int(width * 0.60), int(height * 0.34))
         self.enemy_battlefield_rect.centerx = width // 2 
+
+        enemy_slot_width = int(self.enemy_battlefield_rect.width * 0.25)
+        enemy_slot_height = int(self.enemy_battlefield_rect.height * 0.75)
+        enemy_slot_gap = int(self.enemy_battlefield_rect.width * 0.05)
+
+        enemy_total_width = (enemy_slot_width * 3) + (enemy_slot_gap * 2)
+        enemy_start_x = self.enemy_battlefield_rect.centerx - enemy_total_width // 2
+        enemy_slot_y = self.enemy_battlefield_rect.centery - enemy_slot_height // 2
+
+        self.enemy_battlefield_slots = []
+
+        for i in range(3):
+            slot_rect = pygame.Rect(
+                enemy_start_x + i * (enemy_slot_width + enemy_slot_gap),
+                enemy_slot_y,
+                enemy_slot_width,
+                enemy_slot_height
+            )
+            self.enemy_battlefield_slots.append(slot_rect)
         
         # Game stats area
         self.stats_rect = pygame.Rect(0, 0, int(width * 0.20), 330)
@@ -112,6 +139,7 @@ class BattleScreen:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1 and self.next_rect.collidepoint(event.pos):
                 result = self.battle_state.advance_phase()
+                self.selected_attacker = None
 
                 if result is not None:
                     self.handle_draw_result(result)
@@ -147,6 +175,9 @@ class BattleScreen:
 
         # Right click
         if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                self.handle_combat_click(event.pos)
+
             if event.button == 3:
                 card = self.get_card_under_mouse()
 
@@ -155,6 +186,33 @@ class BattleScreen:
 
     def set_status_message(self, message):
         self.status_message = message
+
+    def handle_combat_click(self, pos):
+        if self.battle_state.turn_manager.current_phase != "action":
+            return
+
+        attacker = self.get_player_battlefield_card_at_pos(pos)
+
+        if attacker is not None:
+            self.selected_attacker = attacker
+            self.set_status_message(f"Selected attacker: {attacker.name}")
+            return
+
+        if self.selected_attacker is None:
+            return
+
+        target = self.get_enemy_target_at_pos(pos)
+
+        if target is None:
+            return
+
+        result = self.battle_state.attack(self.selected_attacker, target)
+
+        if result.success:
+            self.set_status_message(f"{self.selected_attacker.name} dealt {result.damage} damage")
+            self.selected_attacker = None
+        elif result.message:
+            self.set_status_message(result.message)
 
     def handle_play_result(self, result):
         if result.success:
@@ -201,18 +259,47 @@ class BattleScreen:
                 return card_view.card
             
         for i, card in enumerate(self.battle_state.player_board.active_heroes):
-            slot = self.player_battlefield_slots[i]
-
-            card_rect = pygame.Rect(0, 0, int(slot.width * 0.75), int(slot.height * 0.85))
-            card_rect.center = slot.center
-
-            if card_rect.collidepoint(mouse_pos):
+            if self.get_card_rect_for_slot(self.player_battlefield_slots[i]).collidepoint(mouse_pos):
                 return card
+
+        for i, card in enumerate(self.battle_state.enemy_board.active_heroes):
+            if self.get_card_rect_for_slot(self.enemy_battlefield_slots[i]).collidepoint(mouse_pos):
+                return card
+
+        if self.enemy_hero_rect.collidepoint(mouse_pos):
+            return self.battle_state.enemy.hero
         
+        return None
+
+    def get_card_rect_for_slot(self, slot):
+        card_rect = pygame.Rect(0, 0, int(slot.width * 0.75), int(slot.height * 0.85))
+        card_rect.center = slot.center
+        return card_rect
+
+    def get_player_battlefield_card_at_pos(self, pos):
+        for i, card in enumerate(self.battle_state.player_board.active_heroes):
+            if self.get_card_rect_for_slot(self.player_battlefield_slots[i]).collidepoint(pos):
+                return card
+
+        return None
+
+    def get_enemy_target_at_pos(self, pos):
+        for i, card in enumerate(self.battle_state.enemy_board.active_heroes):
+            if self.get_card_rect_for_slot(self.enemy_battlefield_slots[i]).collidepoint(pos):
+                return card
+
+        if self.enemy_hero_rect.collidepoint(pos):
+            return self.battle_state.enemy.hero
+
         return None
     
     def draw_player_battlefield_slots(self, screen):
         for slot in self.player_battlefield_slots:
+            pygame.draw.rect(screen, (120, 20, 20), slot)
+            pygame.draw.rect(screen, (255, 255, 255), slot, 2)
+
+    def draw_enemy_battlefield_slots(self, screen):
+        for slot in self.enemy_battlefield_slots:
             pygame.draw.rect(screen, (120, 20, 20), slot)
             pygame.draw.rect(screen, (255, 255, 255), slot, 2)
     
@@ -220,15 +307,32 @@ class BattleScreen:
         for i, card in enumerate(self.battle_state.player_board.active_heroes):
             slot = self.player_battlefield_slots[i]
 
-            rect = pygame.Rect(0, 0, int(slot.width * 0.75), int(slot.height * 0.85))
-            rect.center = slot.center
+            rect = self.get_card_rect_for_slot(slot)
+
+            pygame.draw.rect(screen, (220, 220, 220), rect)
+            border_colour = (255, 215, 0) if card == self.selected_attacker else (0, 0, 0)
+            pygame.draw.rect(screen, border_colour, rect, 3)
+
+            self.draw_battlefield_card_text(screen, card, rect)
+
+    def draw_enemy_battlefield_cards(self, screen):
+        for i, card in enumerate(self.battle_state.enemy_board.active_heroes):
+            slot = self.enemy_battlefield_slots[i]
+            rect = self.get_card_rect_for_slot(slot)
 
             pygame.draw.rect(screen, (220, 220, 220), rect)
             pygame.draw.rect(screen, (0, 0, 0), rect, 2)
 
-            name_text = self.card_font.render(card.name, True, (0, 0, 0))
-            name_rect = name_text.get_rect(center=rect.center)
-            screen.blit(name_text, name_rect)
+            self.draw_battlefield_card_text(screen, card, rect)
+
+    def draw_battlefield_card_text(self, screen, card, rect):
+        name_text = self.card_font.render(card.name, True, (0, 0, 0))
+        hp_text = self.card_font.render(f"HP: {card.current_hit_points}/{card.hit_points}", True, (0, 0, 0))
+        attack_text = self.card_font.render(f"ATK: {card.attack}", True, (0, 0, 0))
+
+        screen.blit(name_text, (rect.x + 8, rect.y + 18))
+        screen.blit(hp_text, (rect.x + 8, rect.y + 48))
+        screen.blit(attack_text, (rect.x + 8, rect.y + 78))
             
 
     def draw_card_info(self, screen, card):
@@ -246,8 +350,10 @@ class BattleScreen:
         screen.blit(hp_text, (x, y + 90))
 
         if card.card_type == "Hero":
+            current_hp_text = self.card_font.render(f"Current HP: {card.current_hit_points}", True, (255, 255, 255))
             attack_text = self.card_font.render(f"Attack: {card.attack}", True, (255, 255, 255))
-            screen.blit(attack_text, (x, y + 120))
+            screen.blit(current_hp_text, (x, y + 120))
+            screen.blit(attack_text, (x, y + 145))
 
         if card.card_type == "Mana":
             mana_text = self.card_font.render(f"Adds Mana: {card.mana_value}", True, (255, 255, 255))
@@ -286,6 +392,17 @@ class BattleScreen:
         screen.blit(hand_text, (x, y + 75))
         screen.blit(discard_text, (x, y + 100))
 
+    def draw_enemy_hero(self, screen):
+        pygame.draw.rect(screen, (255, 100, 100), self.enemy_hero_rect)
+
+        enemy = self.battle_state.enemy
+
+        name_text = self.card_font.render(enemy.hero.name, True, (0, 0, 0))
+        hp_text = self.card_font.render(f"HP: {enemy.hero.current_hit_points}/{enemy.hero.hit_points}", True, (0, 0, 0))
+
+        screen.blit(name_text, (self.enemy_hero_rect.x + 15, self.enemy_hero_rect.y + 20))
+        screen.blit(hp_text, (self.enemy_hero_rect.x + 15, self.enemy_hero_rect.y + 55))
+
     def draw_status_message(self, screen):
         pygame.draw.rect(screen, (20, 20, 20), self.status_rect)
         pygame.draw.rect(screen, (255, 255, 255), self.status_rect, 2)
@@ -306,6 +423,8 @@ class BattleScreen:
 
         self.draw_zone(screen, self.enemy_battlefield_rect, (200, 50, 50), "Enemy Battlefield")
         self.draw_zone(screen, self.player_battlefield_rect, (255, 50, 50), "Player Battlefield")
+        self.draw_enemy_battlefield_slots(screen)
+        self.draw_enemy_battlefield_cards(screen)
         self.draw_player_battlefield_slots(screen)
         self.draw_player_battlefield_cards(screen)
 
@@ -325,7 +444,7 @@ class BattleScreen:
         self.draw_zone(screen, self.next_rect, (255, 255, 0), "Next Phase", text_colour=(0, 0, 0))
         self.draw_zone(screen, self.hand_rect, (55, 0, 150), "Hand")
         self.draw_player_hero(screen)
-        self.draw_zone(screen, self.enemy_hero_rect, (255, 100, 100), "Enemy Hero")
+        self.draw_enemy_hero(screen)
 
         info_text = self.font.render("Press ESC to return to menu", True, (255, 255, 255))
 

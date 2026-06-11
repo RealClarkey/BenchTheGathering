@@ -17,6 +17,7 @@ class Card:
         self.card_type = card_type
         self.hero_type = hero_type
         self.hit_points = hit_points
+        self.current_hit_points = hit_points
         self.attack = attack
         self.mana_value = mana_value
         self.mana_cost = mana_cost

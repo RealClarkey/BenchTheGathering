@@ -12,3 +12,10 @@ class Board:
 
         self.active_heroes.append(card)
         return True
+
+    def remove_hero(self, card):
+        if card not in self.active_heroes:
+            return False
+
+        self.active_heroes.remove(card)
+        return True

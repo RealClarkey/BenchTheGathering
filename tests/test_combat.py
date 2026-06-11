@@ -1,0 +1,96 @@
+from src.cards.card import Card
+from src.gameplay.battle_state import BattleState
+
+
+def advance_to_action_phase(battle_state):
+    battle_state.advance_phase()
+    battle_state.advance_phase()
+    battle_state.advance_phase()
+
+
+def test_type_advantage_damage_modifiers():
+    battle_state = BattleState(Card("Commander", "Dark", 30), [], starting_hand_size=0)
+
+    assert battle_state.calculate_damage(Card("Dark", "Dark", 10, attack=4), Card("Nature", "Nature", 10)) == 5
+    assert battle_state.calculate_damage(Card("Nature", "Nature", 10, attack=4), Card("Dark", "Dark", 10)) == 3
+    assert battle_state.calculate_damage(Card("Neutral", "Neutral", 10, attack=4), Card("Dark", "Dark", 10)) == 4
+
+
+def test_attack_damages_enemy_battlefield_hero():
+    attacker = Card("Attacker", "Dark", 10, attack=4)
+    target = Card("Target", "Nature", 10)
+    battle_state = BattleState(Card("Commander", "Dark", 30), [], starting_hand_size=0)
+    battle_state.player_board.add_hero(attacker)
+    battle_state.enemy_board.add_hero(target)
+    advance_to_action_phase(battle_state)
+
+    result = battle_state.attack(attacker, target)
+
+    assert result.success
+    assert result.damage == 5
+    assert target.current_hit_points == 5
+
+
+def test_attack_removes_defeated_enemy_battlefield_hero():
+    attacker = Card("Attacker", "Dark", 10, attack=4)
+    target = Card("Target", "Nature", 5)
+    battle_state = BattleState(Card("Commander", "Dark", 30), [], starting_hand_size=0)
+    battle_state.player_board.add_hero(attacker)
+    battle_state.enemy_board.add_hero(target)
+    advance_to_action_phase(battle_state)
+
+    result = battle_state.attack(attacker, target)
+
+    assert result.success
+    assert target not in battle_state.enemy_board.active_heroes
+
+
+def test_attack_can_target_enemy_commander():
+    attacker = Card("Attacker", "Tech", 10, attack=4)
+    enemy_commander = Card("Enemy Commander", "Dark", 20)
+    battle_state = BattleState(
+        Card("Commander", "Dark", 30),
+        [],
+        starting_hand_size=0,
+        enemy_hero=enemy_commander,
+    )
+    battle_state.player_board.add_hero(attacker)
+    advance_to_action_phase(battle_state)
+
+    result = battle_state.attack(attacker, enemy_commander)
+
+    assert result.success
+    assert enemy_commander.current_hit_points == 15
+
+
+def test_attack_only_allowed_in_action_phase():
+    attacker = Card("Attacker", "Dark", 10, attack=4)
+    target = Card("Target", "Nature", 10)
+    battle_state = BattleState(Card("Commander", "Dark", 30), [], starting_hand_size=0)
+    battle_state.player_board.add_hero(attacker)
+    battle_state.enemy_board.add_hero(target)
+
+    result = battle_state.attack(attacker, target)
+
+    assert not result.success
+    assert result.message == "You can only attack during the action phase"
+    assert target.current_hit_points == 10
+
+
+def test_attacker_can_only_attack_once_per_turn():
+    attacker = Card("Attacker", "Dark", 10, attack=4)
+    first_target = Card("First Target", "Nature", 10)
+    second_target = Card("Second Target", "Nature", 10)
+    battle_state = BattleState(Card("Commander", "Dark", 30), [], starting_hand_size=0)
+    battle_state.player_board.add_hero(attacker)
+    battle_state.enemy_board.add_hero(first_target)
+    battle_state.enemy_board.add_hero(second_target)
+    advance_to_action_phase(battle_state)
+
+    first_result = battle_state.attack(attacker, first_target)
+    second_result = battle_state.attack(attacker, second_target)
+
+    assert first_result.success
+    assert not second_result.success
+    assert second_result.message == "This hero has already attacked this turn"
+    assert second_target.current_hit_points == 10

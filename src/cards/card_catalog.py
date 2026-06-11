@@ -53,6 +53,16 @@ def create_skill_cards():
     ]
 
 
+def create_default_enemy_setup():
+    return (
+        Card("Enemy Commander", "Tech", 30, attack=1),
+        [
+            Card("Enemy Guard", "Nature", 12, attack=2),
+            Card("Enemy Scout", "Dark", 10, attack=2),
+        ],
+    )
+
+
 def create_demo_card_pool(commander):
     cards = []
 

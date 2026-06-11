@@ -1,5 +1,6 @@
 from src.cards.deck import Deck
 from src.cards.hand import Hand
+from src.cards.card import Card
 from src.gameplay.board import Board
 from src.gameplay.player import Player
 from src.gameplay.turn_manager import TurnManager
@@ -21,6 +22,13 @@ class DrawResult:
         return len(self.drawn_cards) > 0
 
 
+class CombatResult:
+    def __init__(self, success, message="", damage=0):
+        self.success = success
+        self.message = message
+        self.damage = damage
+
+
 class BattleState:
     def __init__(
         self,
@@ -29,6 +37,8 @@ class BattleState:
         starting_hand_size=7,
         max_hand_size=7,
         shuffle_deck=True,
+        enemy_hero=None,
+        enemy_board_cards=None,
     ):
         self.player = Player()
         self.player.set_hero(player_hero)
@@ -40,10 +50,18 @@ class BattleState:
         self.player_hand = Hand(max_size=max_hand_size)
         self.player_discard_pile = []
         self.player_board = Board()
+        self.enemy = Player()
+        self.enemy.set_hero(enemy_hero or Card("Enemy Commander", "Tech", 30, attack=1))
+        self.enemy_board = Board()
+
+        for card in enemy_board_cards or []:
+            self.enemy_board.add_hero(card)
+
         self.turn_manager = TurnManager()
         self.resolved_phase_key = None
         self.has_played_mana_this_turn = False
         self.has_played_main_card_this_turn = False
+        self.attackers_this_turn = set()
         self.starting_hand_size = starting_hand_size
         self.shuffle_deck = shuffle_deck
         self.has_used_mulligan = False
@@ -64,6 +82,7 @@ class BattleState:
             self.player.refresh_mana()
             self.has_played_mana_this_turn = False
             self.has_played_main_card_this_turn = False
+            self.attackers_this_turn.clear()
 
         if self.turn_manager.current_phase == "draw":
             result = self.draw_cards(1)
@@ -127,6 +146,46 @@ class BattleState:
         self.player_discard_pile.extend(discarded_cards)
 
         return DrawResult(drawn_cards, discarded_cards)
+
+    def calculate_damage(self, attacker, target):
+        damage = attacker.attack
+        matchup = {
+            "Dark": "Nature",
+            "Nature": "Tech",
+            "Tech": "Dark",
+        }
+
+        if attacker.hero_type != "Neutral" and target.hero_type != "Neutral":
+            if matchup.get(attacker.hero_type) == target.hero_type:
+                damage *= 1.25
+            elif matchup.get(target.hero_type) == attacker.hero_type:
+                damage *= 0.75
+
+        return int(round(damage))
+
+    def attack(self, attacker, target):
+        if self.turn_manager.current_phase != "action":
+            return CombatResult(False, "You can only attack during the action phase")
+
+        if attacker not in self.player_board.active_heroes:
+            return CombatResult(False, "Attacker must be a hero on your battlefield")
+
+        if id(attacker) in self.attackers_this_turn:
+            return CombatResult(False, "This hero has already attacked this turn")
+
+        valid_targets = self.enemy_board.active_heroes + [self.enemy.hero]
+
+        if target not in valid_targets:
+            return CombatResult(False, "Target must be an enemy hero")
+
+        damage = self.calculate_damage(attacker, target)
+        target.current_hit_points -= damage
+        self.attackers_this_turn.add(id(attacker))
+
+        if target in self.enemy_board.active_heroes and target.current_hit_points <= 0:
+            self.enemy_board.remove_hero(target)
+
+        return CombatResult(True, damage=damage)
 
     def play_mana_card(self, card):
         if card not in self.player_hand.cards:
