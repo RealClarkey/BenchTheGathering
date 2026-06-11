@@ -2,7 +2,7 @@ import pygame
 from src.ui.hand_view import HandView
 
 from src.cards.card_catalog import create_demo_deck
-from src.gameplay.battle_state import BattleState
+from src.gameplay.battle_state import BattleState, PlayResult
 
 
 class BattleScreen:
@@ -115,11 +115,15 @@ class BattleScreen:
             drop_pos = self.hand_view.drop_position
 
             if self.player_hero_rect.collidepoint(drop_pos):
-                print("Commander is already selected")
+                if dropped_card.card_type == "Mana":
+                    result = self.battle_state.play_mana_card(dropped_card)
+                    self.handle_play_result(result)
+                else:
+                    print("Commander is already selected")
             else:
-                for slot in self.player_battlefield_slots:
+                for index, slot in enumerate(self.player_battlefield_slots):
                     if slot.collidepoint(drop_pos):
-                        result = self.battle_state.play_card_to_player_battlefield(dropped_card)
+                        result = self.play_card_on_battlefield_slot(dropped_card, index)
                         self.handle_play_result(result)
                         break
 
@@ -140,6 +144,17 @@ class BattleScreen:
             self.hand_view.build_fan()
         elif result.message:
             print(result.message) # Replace with UI feedback later.
+
+    def play_card_on_battlefield_slot(self, card, slot_index):
+        if card.card_type == "Skill":
+            active_heroes = self.battle_state.player_board.active_heroes
+
+            if slot_index >= len(active_heroes):
+                return PlayResult(False, "Skill target must be a hero on your battlefield")
+
+            return self.battle_state.play_skill_card(card, active_heroes[slot_index])
+
+        return self.battle_state.play_card_to_player_battlefield(card)
 
     def handle_draw_result(self, result):
         if not result.success:
@@ -195,14 +210,28 @@ class BattleScreen:
 
         name_text = self.card_font.render(card.name, True, (255, 255, 255))
         type_text = self.card_font.render(f"Type: {card.hero_type}", True, (255, 255, 255))
+        card_type_text = self.card_font.render(f"Card: {card.card_type}", True, (255, 255, 255))
         hp_text = self.card_font.render(f"HP: {card.hit_points}", True, (255, 255, 255))
 
         screen.blit(name_text, (x, y))
         screen.blit(type_text, (x, y + 30))
-        screen.blit(hp_text, (x, y + 60))
+        screen.blit(card_type_text, (x, y + 60))
+        screen.blit(hp_text, (x, y + 90))
+
+        if card.card_type == "Hero":
+            attack_text = self.card_font.render(f"Attack: {card.attack}", True, (255, 255, 255))
+            screen.blit(attack_text, (x, y + 120))
+
+        if card.card_type == "Mana":
+            mana_text = self.card_font.render(f"Adds Mana: {card.mana_value}", True, (255, 255, 255))
+            screen.blit(mana_text, (x, y + 120))
+
+        if card.card_type == "Skill":
+            skill_text = self.card_font.render(f"Attack Buff: +{card.attack_bonus}", True, (255, 255, 255))
+            screen.blit(skill_text, (x, y + 120))
 
         # abilities
-        y_offset = 100
+        y_offset = 155
         for ability in card.abilities:
             ability_text = self.card_font.render(
                 f"{ability.name} ({ability.mana_cost}) dmg:{ability.attack_damage}",

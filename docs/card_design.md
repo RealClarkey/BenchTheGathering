@@ -30,6 +30,7 @@
 - Mana value
 - Increases max mana when played
 - Mana refills to max at the start of each turn
+- Current prototype: Mana cards add 1 to max mana and current mana
 
 ----------
 
@@ -39,6 +40,7 @@
 - Target Type (Self, Ally or Enemy)
 - Duration (Instant, Timed, Permanent (buff) )
 - Effect (ability)
+- Current prototype: Battle Training applies +1 attack to a hero on your battlefield
 
 ## External Resources:
 - https://game-icons.net/

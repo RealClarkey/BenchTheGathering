@@ -41,6 +41,38 @@ class BattleState:
 
         return DrawResult(drawn_cards, discarded_cards)
 
+    def play_mana_card(self, card):
+        if card not in self.player_hand.cards:
+            return PlayResult(False, "Card is not in hand")
+
+        if card.card_type != "Mana":
+            return PlayResult(False, "Only mana cards can be played as mana")
+
+        self.player.max_mana += card.mana_value
+        self.player.current_mana += card.mana_value
+        self.player_hand.remove(card)
+        self.player_discard_pile.append(card)
+
+        return PlayResult(True)
+
+    def play_skill_card(self, card, target):
+        if card not in self.player_hand.cards:
+            return PlayResult(False, "Card is not in hand")
+
+        if card.card_type != "Skill":
+            return PlayResult(False, "Only skill cards can be played as skills")
+
+        if target not in self.player_board.active_heroes:
+            return PlayResult(False, "Skill target must be a hero on your battlefield")
+
+        if card.effect == "buff_attack":
+            target.attack += card.attack_bonus
+
+        self.player_hand.remove(card)
+        self.player_discard_pile.append(card)
+
+        return PlayResult(True)
+
     def play_card_to_player_battlefield(self, card):
         if card not in self.player_hand.cards:
             return PlayResult(False, "Card is not in hand")
