@@ -12,6 +12,7 @@ def test_catalog_includes_mana_and_skill_cards():
     assert skill_cards[0].card_type == "Skill"
     assert skill_cards[0].effect == "buff_attack"
     assert skill_cards[0].attack_bonus == 1
+    assert skill_cards[0].mana_cost == 1
 
 
 def test_demo_deck_includes_hero_mana_and_skill_cards():
@@ -54,6 +55,48 @@ def test_playing_mana_card_increases_player_mana():
     assert mana_card in battle_state.player_discard_pile
 
 
+def test_only_one_mana_card_can_be_played_each_turn():
+    commander = Card("Commander", "Dark", 30)
+    first_mana = Card("Mana 1", "Neutral", 0, card_type="Mana", mana_value=1)
+    second_mana = Card("Mana 2", "Neutral", 0, card_type="Mana", mana_value=1)
+    battle_state = BattleState(
+        commander,
+        [first_mana, second_mana],
+        starting_hand_size=2,
+    )
+
+    first_result = battle_state.play_mana_card(first_mana)
+    second_result = battle_state.play_mana_card(second_mana)
+
+    assert first_result.success
+    assert not second_result.success
+    assert second_result.message == "You can only play one mana card per turn"
+    assert battle_state.player.max_mana == 1
+    assert second_mana in battle_state.player_hand.cards
+
+
+def test_start_phase_resets_mana_play_limit():
+    commander = Card("Commander", "Dark", 30)
+    first_mana = Card("Mana 1", "Neutral", 0, card_type="Mana", mana_value=1)
+    second_mana = Card("Mana 2", "Neutral", 0, card_type="Mana", mana_value=1)
+    battle_state = BattleState(
+        commander,
+        [first_mana, second_mana],
+        starting_hand_size=2,
+    )
+    battle_state.play_mana_card(first_mana)
+
+    battle_state.advance_phase()
+    battle_state.advance_phase()
+    battle_state.advance_phase()
+    battle_state.advance_phase()
+    battle_state.advance_phase()
+    result = battle_state.play_mana_card(second_mana)
+
+    assert result.success
+    assert battle_state.player.max_mana == 2
+
+
 def test_attack_buff_skill_increases_battlefield_hero_attack():
     commander = Card("Commander", "Dark", 30)
     hero = Card("Hero", "Nature", 20, attack=2)
@@ -64,20 +107,121 @@ def test_attack_buff_skill_increases_battlefield_hero_attack():
         card_type="Skill",
         effect="buff_attack",
         attack_bonus=1,
+        mana_cost=1,
     )
     battle_state = BattleState(
         commander,
         [hero, skill_card],
         starting_hand_size=2,
     )
-    battle_state.play_card_to_player_battlefield(hero)
+    battle_state.player.current_mana = 1
+    battle_state.player_board.add_hero(hero)
 
     result = battle_state.play_skill_card(skill_card, hero)
 
     assert result.success
     assert hero.attack == 3
+    assert battle_state.player.current_mana == 0
     assert skill_card not in battle_state.player_hand.cards
     assert skill_card in battle_state.player_discard_pile
+
+
+def test_skill_card_requires_enough_mana():
+    commander = Card("Commander", "Dark", 30)
+    hero = Card("Hero", "Nature", 20, attack=2)
+    skill_card = Card(
+        "Training",
+        "Neutral",
+        0,
+        card_type="Skill",
+        effect="buff_attack",
+        attack_bonus=1,
+        mana_cost=1,
+    )
+    battle_state = BattleState(
+        commander,
+        [hero, skill_card],
+        starting_hand_size=2,
+    )
+    battle_state.player_board.add_hero(hero)
+
+    result = battle_state.play_skill_card(skill_card, hero)
+
+    assert not result.success
+    assert result.message == "Not enough mana"
+    assert hero.attack == 2
+    assert skill_card in battle_state.player_hand.cards
+
+
+def test_only_one_hero_or_skill_card_can_be_played_each_turn():
+    commander = Card("Commander", "Dark", 30)
+    first_hero = Card("Hero 1", "Nature", 20, attack=2)
+    second_hero = Card("Hero 2", "Tech", 20, attack=2)
+    battle_state = BattleState(
+        commander,
+        [first_hero, second_hero],
+        starting_hand_size=2,
+    )
+
+    first_result = battle_state.play_card_to_player_battlefield(first_hero)
+    second_result = battle_state.play_card_to_player_battlefield(second_hero)
+
+    assert first_result.success
+    assert not second_result.success
+    assert second_result.message == "You can only play one hero or skill card per turn"
+    assert second_hero in battle_state.player_hand.cards
+
+
+def test_skill_card_uses_main_card_play_for_turn():
+    commander = Card("Commander", "Dark", 30)
+    hero = Card("Hero", "Nature", 20, attack=2)
+    skill_card = Card(
+        "Training",
+        "Neutral",
+        0,
+        card_type="Skill",
+        effect="buff_attack",
+        attack_bonus=1,
+        mana_cost=1,
+    )
+    second_hero = Card("Hero 2", "Tech", 20, attack=2)
+    battle_state = BattleState(
+        commander,
+        [hero, skill_card, second_hero],
+        starting_hand_size=3,
+    )
+    battle_state.player.current_mana = 1
+    battle_state.player_board.add_hero(hero)
+
+    skill_result = battle_state.play_skill_card(skill_card, hero)
+    hero_result = battle_state.play_card_to_player_battlefield(second_hero)
+
+    assert skill_result.success
+    assert not hero_result.success
+    assert hero_result.message == "You can only play one hero or skill card per turn"
+    assert second_hero in battle_state.player_hand.cards
+
+
+def test_start_phase_resets_main_card_play_limit():
+    commander = Card("Commander", "Dark", 30)
+    first_hero = Card("Hero 1", "Nature", 20, attack=2)
+    second_hero = Card("Hero 2", "Tech", 20, attack=2)
+    battle_state = BattleState(
+        commander,
+        [first_hero, second_hero],
+        starting_hand_size=2,
+    )
+    battle_state.play_card_to_player_battlefield(first_hero)
+
+    battle_state.advance_phase()
+    battle_state.advance_phase()
+    battle_state.advance_phase()
+    battle_state.advance_phase()
+    battle_state.advance_phase()
+    result = battle_state.play_card_to_player_battlefield(second_hero)
+
+    assert result.success
+    assert second_hero in battle_state.player_board.active_heroes
 
 
 def test_attack_buff_skill_requires_battlefield_hero_target():

@@ -58,6 +58,23 @@ def test_battle_state_draws_starting_hand_after_hero_selection():
     assert len(battle_state.player_deck) == 1
 
 
+def test_battle_state_starting_hand_includes_hero_when_deck_has_one():
+    commander = Card("Commander", "Dark", 30)
+    mana_card = Card("Mana", "Neutral", 0, card_type="Mana")
+    skill_card = Card("Skill", "Neutral", 0, card_type="Skill")
+    hero_card = Card("Hero", "Nature", 10)
+
+    battle_state = BattleState(
+        commander,
+        [mana_card, skill_card, hero_card],
+        starting_hand_size=2,
+        shuffle_deck=False,
+    )
+
+    assert hero_card in battle_state.player_hand.cards
+    assert len(battle_state.player_hand) == 2
+
+
 def test_battle_state_discards_drawn_cards_when_hand_is_full():
     commander = Card("Commander", "Dark", 30)
     deck_cards = [

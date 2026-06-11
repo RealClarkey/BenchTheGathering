@@ -9,7 +9,6 @@ class MenuScreen:
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                print("Switching to commander select screen")
                 self.game.change_screen("commander_select")
 
 

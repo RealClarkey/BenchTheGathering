@@ -46,6 +46,7 @@ def create_skill_cards():
             hero_type="Neutral",
             hit_points=0,
             card_type="Skill",
+            mana_cost=1,
             effect="buff_attack",
             attack_bonus=1,
         )

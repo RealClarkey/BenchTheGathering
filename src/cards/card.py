@@ -9,6 +9,7 @@ class Card:
         card_type="Hero",
         attack=0,
         mana_value=0,
+        mana_cost=0,
         effect=None,
         attack_bonus=0,
     ):
@@ -18,6 +19,7 @@ class Card:
         self.hit_points = hit_points
         self.attack = attack
         self.mana_value = mana_value
+        self.mana_cost = mana_cost
         self.effect = effect
         self.attack_bonus = attack_bonus
 

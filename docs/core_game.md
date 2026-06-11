@@ -28,6 +28,7 @@
 ---
 
 ## Turn Structure
+- Current prototype advances phases with the Next Phase button
 
 ### Start of Turn
 - Refresh mana
@@ -38,7 +39,7 @@
 
 ### Main Phase
 - Play 1 Mana card (optional)
-- Play 1 Hero card OR skill card
+- Play 1 Hero card OR Skill card
 
 ### Action Phase
 - Attack with Heroes
@@ -67,6 +68,8 @@
 - Mana refills each turn
 - Current mana cannot exceed max mana
 - Playing mana cards is required to increase max mana
+- Players can play 1 Mana card per turn
+- Current prototype Skill cards cost 1 mana
 
 ---
 

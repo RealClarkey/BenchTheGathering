@@ -18,4 +18,7 @@ class Player:
         self.max_mana = 0
         self.current_mana = 0
 
+    def refresh_mana(self):
+        self.current_mana = self.max_mana
+
 

@@ -17,6 +17,7 @@ class BattleScreen:
 
         self.battle_state = BattleState(player_hero, deck_cards, starting_hand_size=7)
         self.selected_card = None
+        self.status_message = "Choose cards to play"
 
         self.hand_view = HandView(self.battle_state.player_hand.cards, self.hand_rect)
 
@@ -74,6 +75,9 @@ class BattleScreen:
 
         # Enemy hero area
         self.enemy_hero_rect = pygame.Rect(0, 0, int(width * 0.20), int(width * 0.20))
+
+        # Status message area
+        self.status_rect = pygame.Rect(int(width * 0.25), int(height * 0.70), int(width * 0.50), 45)
     
     def draw_player_hero(self, screen):
         pygame.draw.rect(screen,(0, 100, 100), self.player_hero_rect)
@@ -99,12 +103,15 @@ class BattleScreen:
         # ESC handling for current development
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                print("Returning to menu screen")
+                self.set_status_message("Returning to menu")
                 self.game.change_screen("menu")
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1 and self.next_rect.collidepoint(event.pos):
-                self.handle_draw_result(self.battle_state.draw_cards(1))
+                result = self.battle_state.advance_phase()
+
+                if result is not None:
+                    self.handle_draw_result(result)
 
         # Let HandView process drag/drop first
         self.hand_view.handle_event(event)
@@ -119,7 +126,7 @@ class BattleScreen:
                     result = self.battle_state.play_mana_card(dropped_card)
                     self.handle_play_result(result)
                 else:
-                    print("Commander is already selected")
+                    self.set_status_message("Commander is already selected")
             else:
                 for index, slot in enumerate(self.player_battlefield_slots):
                     if slot.collidepoint(drop_pos):
@@ -139,11 +146,15 @@ class BattleScreen:
                 if card:
                     self.selected_card = card
 
+    def set_status_message(self, message):
+        self.status_message = message
+
     def handle_play_result(self, result):
         if result.success:
             self.hand_view.build_fan()
+            self.set_status_message("Card played")
         elif result.message:
-            print(result.message) # Replace with UI feedback later.
+            self.set_status_message(result.message)
 
     def play_card_on_battlefield_slot(self, card, slot_index):
         if card.card_type == "Skill":
@@ -158,13 +169,15 @@ class BattleScreen:
 
     def handle_draw_result(self, result):
         if not result.success:
-            print("Deck is empty")
+            self.set_status_message("Deck is empty")
             return
 
         self.hand_view.build_fan()
 
         if result.discarded_cards:
-            print("Hand is full. Excess drawn cards were discarded.")
+            self.set_status_message("Hand is full. Excess drawn cards were discarded.")
+        else:
+            self.set_status_message("Drew 1 card")
 
     def get_card_under_mouse(self):
         mouse_pos = pygame.mouse.get_pos()
@@ -229,6 +242,8 @@ class BattleScreen:
         if card.card_type == "Skill":
             skill_text = self.card_font.render(f"Attack Buff: +{card.attack_bonus}", True, (255, 255, 255))
             screen.blit(skill_text, (x, y + 120))
+            cost_text = self.card_font.render(f"Cost: {card.mana_cost}", True, (255, 255, 255))
+            screen.blit(cost_text, (x, y + 145))
 
         # abilities
         y_offset = 155
@@ -243,15 +258,27 @@ class BattleScreen:
 
     def draw_deck_info(self, screen):
         x = self.stats_rect.x + 10
-        y = self.stats_rect.bottom - 100
+        y = self.stats_rect.bottom - 150
 
+        phase_text = self.card_font.render(f"Phase: {self.battle_state.turn_manager.current_phase}", True, (255, 255, 255))
+        turn_text = self.card_font.render(f"Turn: {self.battle_state.turn_manager.turn_number}", True, (255, 255, 255))
         deck_text = self.card_font.render(f"Deck: {len(self.battle_state.player_deck)}", True, (255, 255, 255))
         hand_text = self.card_font.render(f"Hand: {len(self.battle_state.player_hand)}/{self.battle_state.player_hand.max_size}", True, (255, 255, 255))
         discard_text = self.card_font.render(f"Discard: {len(self.battle_state.player_discard_pile)}", True, (255, 255, 255))
 
-        screen.blit(deck_text, (x, y))
-        screen.blit(hand_text, (x, y + 25))
-        screen.blit(discard_text, (x, y + 50))
+        screen.blit(phase_text, (x, y))
+        screen.blit(turn_text, (x, y + 25))
+        screen.blit(deck_text, (x, y + 50))
+        screen.blit(hand_text, (x, y + 75))
+        screen.blit(discard_text, (x, y + 100))
+
+    def draw_status_message(self, screen):
+        pygame.draw.rect(screen, (20, 20, 20), self.status_rect)
+        pygame.draw.rect(screen, (255, 255, 255), self.status_rect, 2)
+
+        text = self.card_font.render(self.status_message, True, (255, 255, 255))
+        text_rect = text.get_rect(center=self.status_rect.center)
+        screen.blit(text, text_rect)
 
 
     def update(self):
@@ -280,7 +307,7 @@ class BattleScreen:
 
         self.draw_deck_info(screen)
 
-        self.draw_zone(screen, self.next_rect, (255, 255, 0), "Draw", text_colour=(0, 0, 0))
+        self.draw_zone(screen, self.next_rect, (255, 255, 0), "Next Phase", text_colour=(0, 0, 0))
         self.draw_zone(screen, self.hand_rect, (55, 0, 150), "Hand")
         self.draw_player_hero(screen)
         self.draw_zone(screen, self.enemy_hero_rect, (255, 100, 100), "Enemy Hero")
@@ -290,6 +317,7 @@ class BattleScreen:
         screen.blit(info_text, (330, 350))
 
         self.hand_view.draw(screen)
+        self.draw_status_message(screen)
 
     def draw_zone(self, screen, rect, colour, label, text_colour=(255, 255, 255)):
         pygame.draw.rect(screen, colour, rect)
