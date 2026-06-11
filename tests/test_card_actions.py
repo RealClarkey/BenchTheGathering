@@ -23,6 +23,23 @@ def test_demo_deck_includes_hero_mana_and_skill_cards():
     assert {"Hero", "Mana", "Skill"}.issubset(card_types)
 
 
+def test_demo_deck_uses_prototype_card_type_ratio():
+    commander = Card("Ishani", "Nature", 80)
+
+    deck = create_demo_deck(commander, target_size=30)
+    card_type_counts = {
+        "Hero": len([card for card in deck if card.card_type == "Hero"]),
+        "Mana": len([card for card in deck if card.card_type == "Mana"]),
+        "Skill": len([card for card in deck if card.card_type == "Skill"]),
+    }
+
+    assert card_type_counts == {
+        "Hero": 12,
+        "Mana": 10,
+        "Skill": 8,
+    }
+
+
 def test_playing_mana_card_increases_player_mana():
     commander = Card("Commander", "Dark", 30)
     mana_card = Card("Mana", "Neutral", 0, card_type="Mana", mana_value=1)

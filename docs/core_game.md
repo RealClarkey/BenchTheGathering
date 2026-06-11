@@ -8,6 +8,7 @@
 - 20-30 cards per deck
 - No duplicate limit (for now)
 - Deck contains cards used during the match, excluding the chosen player hero
+- Current 30-card prototype deck uses 12 Hero cards, 10 Mana cards, and 8 Skill cards
 
 ---
 

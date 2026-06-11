@@ -65,14 +65,34 @@ def create_demo_card_pool(commander):
     return cards
 
 
-def create_demo_deck(commander, target_size=30):
-    deck = []
-
-    while len(deck) < target_size:
-        for card in create_demo_card_pool(commander):
+def add_repeated_cards(deck, source_cards, amount):
+    while len(deck) < amount:
+        for card in source_cards:
             deck.append(card)
 
-            if len(deck) == target_size:
+            if len(deck) == amount:
                 break
+
+
+def create_demo_deck(commander, target_size=30):
+    hero_count = 12
+    mana_count = 10
+    skill_count = 8
+
+    if target_size != 30:
+        hero_count = target_size
+        mana_count = 0
+        skill_count = 0
+
+    deck = []
+    hero_cards = [
+        card
+        for card in create_hero_cards()
+        if card.name != commander.name
+    ]
+
+    add_repeated_cards(deck, hero_cards, hero_count)
+    add_repeated_cards(deck, create_mana_cards(), hero_count + mana_count)
+    add_repeated_cards(deck, create_skill_cards(), hero_count + mana_count + skill_count)
 
     return deck
