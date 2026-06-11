@@ -27,9 +27,17 @@ def create_hero_cards():
     ]
 
 
-def create_demo_deck(commander):
-    return [
-        card
-        for card in create_hero_cards()
-        if card.name != commander.name
-    ]
+def create_demo_deck(commander, target_size=30):
+    deck = []
+
+    while len(deck) < target_size:
+        for card in create_hero_cards():
+            if card.name == commander.name:
+                continue
+
+            deck.append(card)
+
+            if len(deck) == target_size:
+                break
+
+    return deck

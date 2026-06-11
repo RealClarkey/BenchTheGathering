@@ -1,4 +1,5 @@
 from src.cards.card import Card
+from src.cards.card_catalog import create_demo_deck
 from src.cards.deck import Deck
 from src.cards.hand import Hand
 from src.gameplay.battle_state import BattleState
@@ -77,3 +78,12 @@ def test_battle_state_discards_drawn_cards_when_hand_is_full():
     assert len(battle_state.player_hand) == 2
     assert len(result.discarded_cards) == 1
     assert battle_state.player_discard_pile == result.discarded_cards
+
+
+def test_demo_deck_uses_target_size_and_excludes_commander():
+    commander = Card("Ishani", "Nature", 80)
+
+    deck = create_demo_deck(commander, target_size=30)
+
+    assert len(deck) == 30
+    assert commander.name not in [card.name for card in deck]
