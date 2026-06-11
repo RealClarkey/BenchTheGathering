@@ -55,7 +55,7 @@ def create_skill_cards():
 
 def create_default_enemy_setup():
     return (
-        Card("Enemy Commander", "Tech", 30, attack=1),
+        Card("Enemy Player Hero", "Tech", 30, attack=1),
         [
             Card("Enemy Guard", "Nature", 12, attack=2),
             Card("Enemy Scout", "Dark", 10, attack=2),
@@ -63,11 +63,11 @@ def create_default_enemy_setup():
     )
 
 
-def create_demo_card_pool(commander):
+def create_demo_card_pool(player_hero):
     cards = []
 
     for card in create_hero_cards():
-        if card.name != commander.name:
+        if card.name != player_hero.name:
             cards.append(card)
 
     cards.extend(create_mana_cards())
@@ -85,7 +85,7 @@ def add_repeated_cards(deck, source_cards, amount):
                 break
 
 
-def create_demo_deck(commander, target_size=30):
+def create_demo_deck(player_hero, target_size=30):
     hero_count = 12
     mana_count = 10
     skill_count = 8
@@ -99,7 +99,7 @@ def create_demo_deck(commander, target_size=30):
     hero_cards = [
         card
         for card in create_hero_cards()
-        if card.name != commander.name
+        if card.name != player_hero.name
     ]
 
     add_repeated_cards(deck, hero_cards, hero_count)

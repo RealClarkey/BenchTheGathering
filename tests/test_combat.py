@@ -9,7 +9,7 @@ def advance_to_action_phase(battle_state):
 
 
 def test_type_advantage_damage_modifiers():
-    battle_state = BattleState(Card("Commander", "Dark", 30), [], starting_hand_size=0)
+    battle_state = BattleState(Card("Player Hero", "Dark", 30), [], starting_hand_size=0)
 
     assert battle_state.calculate_damage(Card("Dark", "Dark", 10, attack=4), Card("Nature", "Nature", 10)) == 5
     assert battle_state.calculate_damage(Card("Nature", "Nature", 10, attack=4), Card("Dark", "Dark", 10)) == 3
@@ -19,7 +19,7 @@ def test_type_advantage_damage_modifiers():
 def test_attack_damages_enemy_battlefield_hero():
     attacker = Card("Attacker", "Dark", 10, attack=4)
     target = Card("Target", "Nature", 10)
-    battle_state = BattleState(Card("Commander", "Dark", 30), [], starting_hand_size=0)
+    battle_state = BattleState(Card("Player Hero", "Dark", 30), [], starting_hand_size=0)
     battle_state.player_board.add_hero(attacker)
     battle_state.enemy_board.add_hero(target)
     advance_to_action_phase(battle_state)
@@ -35,7 +35,7 @@ def test_attack_damages_enemy_battlefield_hero():
 def test_attack_requires_one_mana():
     attacker = Card("Attacker", "Dark", 10, attack=4)
     target = Card("Target", "Nature", 10)
-    battle_state = BattleState(Card("Commander", "Dark", 30), [], starting_hand_size=0)
+    battle_state = BattleState(Card("Player Hero", "Dark", 30), [], starting_hand_size=0)
     battle_state.player.current_mana = 0
     battle_state.player_board.add_hero(attacker)
     battle_state.enemy_board.add_hero(target)
@@ -51,7 +51,7 @@ def test_attack_requires_one_mana():
 def test_attack_does_not_spend_mana_when_not_action_phase():
     attacker = Card("Attacker", "Dark", 10, attack=4)
     target = Card("Target", "Nature", 10)
-    battle_state = BattleState(Card("Commander", "Dark", 30), [], starting_hand_size=0)
+    battle_state = BattleState(Card("Player Hero", "Dark", 30), [], starting_hand_size=0)
     battle_state.player.current_mana = 1
     battle_state.player_board.add_hero(attacker)
     battle_state.enemy_board.add_hero(target)
@@ -65,7 +65,7 @@ def test_attack_does_not_spend_mana_when_not_action_phase():
 def test_attack_removes_defeated_enemy_battlefield_hero():
     attacker = Card("Attacker", "Dark", 10, attack=4)
     target = Card("Target", "Nature", 5)
-    battle_state = BattleState(Card("Commander", "Dark", 30), [], starting_hand_size=0)
+    battle_state = BattleState(Card("Player Hero", "Dark", 30), [], starting_hand_size=0)
     battle_state.player_board.add_hero(attacker)
     battle_state.enemy_board.add_hero(target)
     advance_to_action_phase(battle_state)
@@ -76,28 +76,69 @@ def test_attack_removes_defeated_enemy_battlefield_hero():
     assert target not in battle_state.enemy_board.active_heroes
 
 
-def test_attack_can_target_enemy_commander():
+def test_attack_can_target_enemy_player_hero():
     attacker = Card("Attacker", "Tech", 10, attack=4)
-    enemy_commander = Card("Enemy Commander", "Dark", 20)
+    enemy_player_hero = Card("Enemy Player Hero", "Dark", 20)
     battle_state = BattleState(
-        Card("Commander", "Dark", 30),
+        Card("Player Hero", "Dark", 30),
         [],
         starting_hand_size=0,
-        enemy_hero=enemy_commander,
+        enemy_hero=enemy_player_hero,
     )
     battle_state.player_board.add_hero(attacker)
     advance_to_action_phase(battle_state)
 
-    result = battle_state.attack(attacker, enemy_commander)
+    result = battle_state.attack(attacker, enemy_player_hero)
 
     assert result.success
-    assert enemy_commander.current_hit_points == 15
+    assert enemy_player_hero.current_hit_points == 15
+
+
+def test_reducing_enemy_player_hero_to_zero_ends_game():
+    attacker = Card("Attacker", "Tech", 10, attack=4)
+    enemy_player_hero = Card("Enemy Player Hero", "Dark", 5)
+    battle_state = BattleState(
+        Card("Player Hero", "Dark", 30),
+        [],
+        starting_hand_size=0,
+        enemy_hero=enemy_player_hero,
+    )
+    battle_state.player_board.add_hero(attacker)
+    advance_to_action_phase(battle_state)
+
+    result = battle_state.attack(attacker, enemy_player_hero)
+
+    assert result.success
+    assert result.game_over
+    assert battle_state.game_over
+    assert battle_state.winner == "player"
+
+
+def test_game_over_blocks_further_attacks():
+    attacker = Card("Attacker", "Tech", 10, attack=4)
+    enemy_player_hero = Card("Enemy Player Hero", "Dark", 5)
+    battle_state = BattleState(
+        Card("Player Hero", "Dark", 30),
+        [],
+        starting_hand_size=0,
+        enemy_hero=enemy_player_hero,
+    )
+    battle_state.player.max_mana = 2
+    battle_state.player.current_mana = 2
+    battle_state.player_board.add_hero(attacker)
+    advance_to_action_phase(battle_state)
+    battle_state.attack(attacker, enemy_player_hero)
+
+    result = battle_state.attack(attacker, enemy_player_hero)
+
+    assert not result.success
+    assert result.message == "Game is already over"
 
 
 def test_attack_only_allowed_in_action_phase():
     attacker = Card("Attacker", "Dark", 10, attack=4)
     target = Card("Target", "Nature", 10)
-    battle_state = BattleState(Card("Commander", "Dark", 30), [], starting_hand_size=0)
+    battle_state = BattleState(Card("Player Hero", "Dark", 30), [], starting_hand_size=0)
     battle_state.player_board.add_hero(attacker)
     battle_state.enemy_board.add_hero(target)
 
@@ -112,7 +153,7 @@ def test_attacker_can_only_attack_once_per_turn():
     attacker = Card("Attacker", "Dark", 10, attack=4)
     first_target = Card("First Target", "Nature", 10)
     second_target = Card("Second Target", "Nature", 10)
-    battle_state = BattleState(Card("Commander", "Dark", 30), [], starting_hand_size=0)
+    battle_state = BattleState(Card("Player Hero", "Dark", 30), [], starting_hand_size=0)
     battle_state.player_board.add_hero(attacker)
     battle_state.enemy_board.add_hero(first_target)
     battle_state.enemy_board.add_hero(second_target)

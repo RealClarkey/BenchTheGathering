@@ -23,10 +23,11 @@ class DrawResult:
 
 
 class CombatResult:
-    def __init__(self, success, message="", damage=0):
+    def __init__(self, success, message="", damage=0, game_over=False):
         self.success = success
         self.message = message
         self.damage = damage
+        self.game_over = game_over
 
 
 class BattleState:
@@ -51,7 +52,7 @@ class BattleState:
         self.player_discard_pile = []
         self.player_board = Board()
         self.enemy = Player()
-        self.enemy.set_hero(enemy_hero or Card("Enemy Commander", "Tech", 30, attack=1))
+        self.enemy.set_hero(enemy_hero or Card("Enemy Player Hero", "Tech", 30, attack=1))
         self.enemy_board = Board()
 
         for card in enemy_board_cards or []:
@@ -67,6 +68,8 @@ class BattleState:
         self.shuffle_deck = shuffle_deck
         self.has_used_mulligan = False
         self.has_played_card_this_game = False
+        self.game_over = False
+        self.winner = None
 
         self.draw_starting_hand(starting_hand_size)
 
@@ -165,6 +168,9 @@ class BattleState:
         return int(round(damage))
 
     def attack(self, attacker, target):
+        if self.game_over:
+            return CombatResult(False, "Game is already over", game_over=True)
+
         if self.turn_manager.current_phase != "action":
             return CombatResult(False, "You can only attack during the action phase")
 
@@ -191,7 +197,11 @@ class BattleState:
         if target in self.enemy_board.active_heroes and target.current_hit_points <= 0:
             self.enemy_board.remove_hero(target)
 
-        return CombatResult(True, damage=damage)
+        if target == self.enemy.hero and target.current_hit_points <= 0:
+            self.game_over = True
+            self.winner = "player"
+
+        return CombatResult(True, damage=damage, game_over=self.game_over)
 
     def play_mana_card(self, card):
         if card not in self.player_hand.cards:

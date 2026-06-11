@@ -3,7 +3,7 @@ import pygame
 from src.cards.card_catalog import create_hero_cards
 
 
-class CommanderSelectScreen:
+class PlayerHeroSelectScreen:
     def __init__(self, game):
         self.game = game
         self.font = pygame.font.SysFont(None, 48)
@@ -38,7 +38,7 @@ class CommanderSelectScreen:
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             for hero, rect in self.hero_rects:
                 if rect.collidepoint(event.pos):
-                    self.game.selected_commander = hero
+                    self.game.selected_player_hero = hero
                     self.game.change_screen("battle")
                     break
 
@@ -48,7 +48,7 @@ class CommanderSelectScreen:
     def draw(self, screen):
         screen.fill((35, 35, 70))
 
-        title_text = self.font.render("Choose Your Commander", True, (255, 255, 255))
+        title_text = self.font.render("Choose Your Player Hero", True, (255, 255, 255))
         title_rect = title_text.get_rect(center=(self.game.width // 2, 80))
         screen.blit(title_text, title_rect)
 

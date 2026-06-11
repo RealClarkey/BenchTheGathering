@@ -81,7 +81,7 @@
     - Enemy Heroes
     - Enemy Player Hero
 - Damage is simultaneous
-- Current prototype uses a default enemy commander and battlefield before AI exists
+- Current prototype uses a default Enemy Player Hero and battlefield before AI exists
 - Attacks are only allowed during the Action Phase
 - Attacks cost 1 mana
 - Each hero can attack once per turn
@@ -113,4 +113,5 @@
 --- 
 
 ## Win Condition
-- Reduce opponent Hero HP to 0
+- Reduce the enemy Player Hero HP to 0
+- Current prototype ends the game immediately when the enemy Player Hero reaches 0 HP

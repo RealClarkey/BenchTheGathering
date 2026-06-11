@@ -3,7 +3,7 @@ import pygame
 
 from src.screens.menu import MenuScreen
 from src.screens.battle import BattleScreen
-from src.screens.commander_select import CommanderSelectScreen
+from src.screens.player_hero_select import PlayerHeroSelectScreen
 
 
 class Game:
@@ -21,19 +21,19 @@ class Game:
 
         self.clock = pygame.time.Clock()
         self.running = True
-        self.selected_commander = None
+        self.selected_player_hero = None
 
         self.screens = {
             "menu": MenuScreen(self),
-            "commander_select": CommanderSelectScreen(self),
+            "player_hero_select": PlayerHeroSelectScreen(self),
             "battle": None
         }
 
         self.current_screen = self.screens["menu"]
 
     def change_screen(self, screen_name):
-        if screen_name == "battle" and self.selected_commander is None:
-            screen_name = "commander_select"
+        if screen_name == "battle" and self.selected_player_hero is None:
+            screen_name = "player_hero_select"
 
         if screen_name == "battle":
             self.screens["battle"] = BattleScreen(self)

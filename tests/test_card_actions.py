@@ -16,18 +16,18 @@ def test_catalog_includes_mana_and_skill_cards():
 
 
 def test_demo_deck_includes_hero_mana_and_skill_cards():
-    commander = Card("Commander", "Dark", 30)
+    player_hero = Card("Player Hero", "Dark", 30)
 
-    deck = create_demo_deck(commander, target_size=30)
+    deck = create_demo_deck(player_hero, target_size=30)
     card_types = {card.card_type for card in deck}
 
     assert {"Hero", "Mana", "Skill"}.issubset(card_types)
 
 
 def test_demo_deck_uses_prototype_card_type_ratio():
-    commander = Card("Ishani", "Nature", 80)
+    player_hero = Card("Ishani", "Nature", 80)
 
-    deck = create_demo_deck(commander, target_size=30)
+    deck = create_demo_deck(player_hero, target_size=30)
     card_type_counts = {
         "Hero": len([card for card in deck if card.card_type == "Hero"]),
         "Mana": len([card for card in deck if card.card_type == "Mana"]),
@@ -42,9 +42,9 @@ def test_demo_deck_uses_prototype_card_type_ratio():
 
 
 def test_playing_mana_card_increases_player_mana():
-    commander = Card("Commander", "Dark", 30)
+    player_hero = Card("Player Hero", "Dark", 30)
     mana_card = Card("Mana", "Neutral", 0, card_type="Mana", mana_value=1)
-    battle_state = BattleState(commander, [mana_card], starting_hand_size=1)
+    battle_state = BattleState(player_hero, [mana_card], starting_hand_size=1)
 
     result = battle_state.play_mana_card(mana_card)
 
@@ -56,11 +56,11 @@ def test_playing_mana_card_increases_player_mana():
 
 
 def test_only_one_mana_card_can_be_played_each_turn():
-    commander = Card("Commander", "Dark", 30)
+    player_hero = Card("Player Hero", "Dark", 30)
     first_mana = Card("Mana 1", "Neutral", 0, card_type="Mana", mana_value=1)
     second_mana = Card("Mana 2", "Neutral", 0, card_type="Mana", mana_value=1)
     battle_state = BattleState(
-        commander,
+        player_hero,
         [first_mana, second_mana],
         starting_hand_size=2,
     )
@@ -76,11 +76,11 @@ def test_only_one_mana_card_can_be_played_each_turn():
 
 
 def test_start_phase_resets_mana_play_limit():
-    commander = Card("Commander", "Dark", 30)
+    player_hero = Card("Player Hero", "Dark", 30)
     first_mana = Card("Mana 1", "Neutral", 0, card_type="Mana", mana_value=1)
     second_mana = Card("Mana 2", "Neutral", 0, card_type="Mana", mana_value=1)
     battle_state = BattleState(
-        commander,
+        player_hero,
         [first_mana, second_mana],
         starting_hand_size=2,
     )
@@ -98,7 +98,7 @@ def test_start_phase_resets_mana_play_limit():
 
 
 def test_attack_buff_skill_increases_battlefield_hero_attack():
-    commander = Card("Commander", "Dark", 30)
+    player_hero = Card("Player Hero", "Dark", 30)
     hero = Card("Hero", "Nature", 20, attack=2)
     skill_card = Card(
         "Training",
@@ -110,7 +110,7 @@ def test_attack_buff_skill_increases_battlefield_hero_attack():
         mana_cost=1,
     )
     battle_state = BattleState(
-        commander,
+        player_hero,
         [hero, skill_card],
         starting_hand_size=2,
     )
@@ -127,7 +127,7 @@ def test_attack_buff_skill_increases_battlefield_hero_attack():
 
 
 def test_skill_card_requires_enough_mana():
-    commander = Card("Commander", "Dark", 30)
+    player_hero = Card("Player Hero", "Dark", 30)
     hero = Card("Hero", "Nature", 20, attack=2)
     skill_card = Card(
         "Training",
@@ -139,7 +139,7 @@ def test_skill_card_requires_enough_mana():
         mana_cost=1,
     )
     battle_state = BattleState(
-        commander,
+        player_hero,
         [hero, skill_card],
         starting_hand_size=2,
     )
@@ -155,11 +155,11 @@ def test_skill_card_requires_enough_mana():
 
 
 def test_only_one_hero_or_skill_card_can_be_played_each_turn():
-    commander = Card("Commander", "Dark", 30)
+    player_hero = Card("Player Hero", "Dark", 30)
     first_hero = Card("Hero 1", "Nature", 20, attack=2)
     second_hero = Card("Hero 2", "Tech", 20, attack=2)
     battle_state = BattleState(
-        commander,
+        player_hero,
         [first_hero, second_hero],
         starting_hand_size=2,
     )
@@ -174,7 +174,7 @@ def test_only_one_hero_or_skill_card_can_be_played_each_turn():
 
 
 def test_skill_card_uses_main_card_play_for_turn():
-    commander = Card("Commander", "Dark", 30)
+    player_hero = Card("Player Hero", "Dark", 30)
     hero = Card("Hero", "Nature", 20, attack=2)
     skill_card = Card(
         "Training",
@@ -187,7 +187,7 @@ def test_skill_card_uses_main_card_play_for_turn():
     )
     second_hero = Card("Hero 2", "Tech", 20, attack=2)
     battle_state = BattleState(
-        commander,
+        player_hero,
         [hero, skill_card, second_hero],
         starting_hand_size=3,
     )
@@ -204,11 +204,11 @@ def test_skill_card_uses_main_card_play_for_turn():
 
 
 def test_start_phase_resets_main_card_play_limit():
-    commander = Card("Commander", "Dark", 30)
+    player_hero = Card("Player Hero", "Dark", 30)
     first_hero = Card("Hero 1", "Nature", 20, attack=2)
     second_hero = Card("Hero 2", "Tech", 20, attack=2)
     battle_state = BattleState(
-        commander,
+        player_hero,
         [first_hero, second_hero],
         starting_hand_size=2,
     )
@@ -226,7 +226,7 @@ def test_start_phase_resets_main_card_play_limit():
 
 
 def test_attack_buff_skill_requires_battlefield_hero_target():
-    commander = Card("Commander", "Dark", 30)
+    player_hero = Card("Player Hero", "Dark", 30)
     hero = Card("Hero", "Nature", 20, attack=2)
     skill_card = Card(
         "Training",
@@ -237,7 +237,7 @@ def test_attack_buff_skill_requires_battlefield_hero_target():
         attack_bonus=1,
     )
     battle_state = BattleState(
-        commander,
+        player_hero,
         [hero, skill_card],
         starting_hand_size=2,
     )

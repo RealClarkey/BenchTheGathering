@@ -12,7 +12,7 @@ class BattleScreen:
         self.card_font = pygame.font.SysFont(None, 20)
 
         self.create_layout()
-        player_hero = self.game.selected_commander
+        player_hero = self.game.selected_player_hero
         deck_cards = create_demo_deck(player_hero)
         enemy_hero, enemy_board_cards = create_default_enemy_setup()
 
@@ -161,7 +161,7 @@ class BattleScreen:
                     result = self.battle_state.play_mana_card(dropped_card)
                     self.handle_play_result(result)
                 else:
-                    self.set_status_message("Commander is already selected")
+                    self.set_status_message("Player Hero is already selected")
             else:
                 for index, slot in enumerate(self.player_battlefield_slots):
                     if slot.collidepoint(drop_pos):
@@ -209,7 +209,10 @@ class BattleScreen:
         result = self.battle_state.attack(self.selected_attacker, target)
 
         if result.success:
-            self.set_status_message(f"{self.selected_attacker.name} spent 1 mana and dealt {result.damage} damage")
+            if result.game_over:
+                self.set_status_message(f"{self.selected_attacker.name} dealt {result.damage} damage. You win!")
+            else:
+                self.set_status_message(f"{self.selected_attacker.name} spent 1 mana and dealt {result.damage} damage")
             self.selected_attacker = None
         elif result.message:
             self.set_status_message(result.message)

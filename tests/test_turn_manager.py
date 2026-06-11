@@ -22,8 +22,8 @@ def test_turn_manager_advances_through_phase_order():
 
 
 def test_start_phase_refills_player_mana():
-    commander = Card("Commander", "Dark", 30)
-    battle_state = BattleState(commander, [], starting_hand_size=0)
+    player_hero = Card("Player Hero", "Dark", 30)
+    battle_state = BattleState(player_hero, [], starting_hand_size=0)
     battle_state.player.max_mana = 3
     battle_state.player.current_mana = 0
 
@@ -32,18 +32,18 @@ def test_start_phase_refills_player_mana():
     assert battle_state.player.current_mana == 3
 
 
-def test_player_starts_with_one_mana_after_choosing_commander():
-    commander = Card("Commander", "Dark", 30)
-    battle_state = BattleState(commander, [], starting_hand_size=0)
+def test_player_starts_with_one_mana_after_choosing_player_hero():
+    player_hero = Card("Player Hero", "Dark", 30)
+    battle_state = BattleState(player_hero, [], starting_hand_size=0)
 
     assert battle_state.player.max_mana == 1
     assert battle_state.player.current_mana == 1
 
 
 def test_draw_phase_draws_one_card_once():
-    commander = Card("Commander", "Dark", 30)
+    player_hero = Card("Player Hero", "Dark", 30)
     deck_card = Card("Deck Card", "Nature", 10)
-    battle_state = BattleState(commander, [deck_card], starting_hand_size=0)
+    battle_state = BattleState(player_hero, [deck_card], starting_hand_size=0)
 
     battle_state.advance_phase()
 
@@ -57,8 +57,8 @@ def test_draw_phase_draws_one_card_once():
 
 
 def test_advancing_from_end_starts_next_turn_and_refills_mana():
-    commander = Card("Commander", "Dark", 30)
-    battle_state = BattleState(commander, [], starting_hand_size=0)
+    player_hero = Card("Player Hero", "Dark", 30)
+    battle_state = BattleState(player_hero, [], starting_hand_size=0)
     battle_state.player.max_mana = 2
     battle_state.player.current_mana = 0
 

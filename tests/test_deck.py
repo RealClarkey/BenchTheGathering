@@ -44,28 +44,28 @@ def test_hand_keeps_same_card_list_when_discarding_excess():
 
 
 def test_battle_state_draws_starting_hand_after_hero_selection():
-    commander = Card("Commander", "Dark", 30)
+    player_hero = Card("Player Hero", "Dark", 30)
     deck_cards = [
         Card("Card 1", "Nature", 10),
         Card("Card 2", "Tech", 10),
         Card("Card 3", "Neutral", 10),
     ]
 
-    battle_state = BattleState(commander, deck_cards, starting_hand_size=2)
+    battle_state = BattleState(player_hero, deck_cards, starting_hand_size=2)
 
-    assert battle_state.player.hero == commander
+    assert battle_state.player.hero == player_hero
     assert len(battle_state.player_hand) == 2
     assert len(battle_state.player_deck) == 1
 
 
 def test_battle_state_starting_hand_includes_hero_when_deck_has_one():
-    commander = Card("Commander", "Dark", 30)
+    player_hero = Card("Player Hero", "Dark", 30)
     mana_card = Card("Mana", "Neutral", 0, card_type="Mana")
     skill_card = Card("Skill", "Neutral", 0, card_type="Skill")
     hero_card = Card("Hero", "Nature", 10)
 
     battle_state = BattleState(
-        commander,
+        player_hero,
         [mana_card, skill_card, hero_card],
         starting_hand_size=2,
         shuffle_deck=False,
@@ -76,13 +76,13 @@ def test_battle_state_starting_hand_includes_hero_when_deck_has_one():
 
 
 def test_mulligan_redraws_starting_hand_once_at_game_start():
-    commander = Card("Commander", "Dark", 30)
+    player_hero = Card("Player Hero", "Dark", 30)
     first_card = Card("First", "Nature", 10)
     second_card = Card("Second", "Tech", 10)
     third_card = Card("Third", "Dark", 10)
     fourth_card = Card("Fourth", "Neutral", 10)
     battle_state = BattleState(
-        commander,
+        player_hero,
         [first_card, second_card, third_card, fourth_card],
         starting_hand_size=2,
         shuffle_deck=False,
@@ -97,7 +97,7 @@ def test_mulligan_redraws_starting_hand_once_at_game_start():
 
 
 def test_mulligan_can_only_be_used_once():
-    commander = Card("Commander", "Dark", 30)
+    player_hero = Card("Player Hero", "Dark", 30)
     deck_cards = [
         Card("First", "Nature", 10),
         Card("Second", "Tech", 10),
@@ -105,7 +105,7 @@ def test_mulligan_can_only_be_used_once():
         Card("Fourth", "Neutral", 10),
     ]
     battle_state = BattleState(
-        commander,
+        player_hero,
         deck_cards,
         starting_hand_size=2,
         shuffle_deck=False,
@@ -120,14 +120,14 @@ def test_mulligan_can_only_be_used_once():
 
 
 def test_mulligan_only_allowed_before_first_phase_advance():
-    commander = Card("Commander", "Dark", 30)
+    player_hero = Card("Player Hero", "Dark", 30)
     deck_cards = [
         Card("First", "Nature", 10),
         Card("Second", "Tech", 10),
         Card("Third", "Dark", 10),
     ]
     battle_state = BattleState(
-        commander,
+        player_hero,
         deck_cards,
         starting_hand_size=2,
         shuffle_deck=False,
@@ -141,10 +141,10 @@ def test_mulligan_only_allowed_before_first_phase_advance():
 
 
 def test_mulligan_not_available_after_playing_mana_card():
-    commander = Card("Commander", "Dark", 30)
+    player_hero = Card("Player Hero", "Dark", 30)
     mana_card = Card("Mana", "Neutral", 0, card_type="Mana", mana_value=1)
     battle_state = BattleState(
-        commander,
+        player_hero,
         [mana_card],
         starting_hand_size=1,
         shuffle_deck=False,
@@ -158,10 +158,10 @@ def test_mulligan_not_available_after_playing_mana_card():
 
 
 def test_mulligan_not_available_after_playing_hero_card():
-    commander = Card("Commander", "Dark", 30)
+    player_hero = Card("Player Hero", "Dark", 30)
     hero_card = Card("Hero", "Nature", 10)
     battle_state = BattleState(
-        commander,
+        player_hero,
         [hero_card],
         starting_hand_size=1,
         shuffle_deck=False,
@@ -175,7 +175,7 @@ def test_mulligan_not_available_after_playing_hero_card():
 
 
 def test_mulligan_not_available_after_playing_skill_card():
-    commander = Card("Commander", "Dark", 30)
+    player_hero = Card("Player Hero", "Dark", 30)
     hero_card = Card("Hero", "Nature", 10)
     skill_card = Card(
         "Training",
@@ -187,7 +187,7 @@ def test_mulligan_not_available_after_playing_skill_card():
         mana_cost=1,
     )
     battle_state = BattleState(
-        commander,
+        player_hero,
         [hero_card, skill_card],
         starting_hand_size=2,
         shuffle_deck=False,
@@ -202,12 +202,12 @@ def test_mulligan_not_available_after_playing_skill_card():
 
 
 def test_mulligan_keeps_a_hero_in_starting_hand_when_possible():
-    commander = Card("Commander", "Dark", 30)
+    player_hero = Card("Player Hero", "Dark", 30)
     mana_card = Card("Mana", "Neutral", 0, card_type="Mana")
     skill_card = Card("Skill", "Neutral", 0, card_type="Skill")
     hero_card = Card("Hero", "Nature", 10)
     battle_state = BattleState(
-        commander,
+        player_hero,
         [mana_card, skill_card, hero_card],
         starting_hand_size=2,
         shuffle_deck=False,
@@ -219,14 +219,14 @@ def test_mulligan_keeps_a_hero_in_starting_hand_when_possible():
 
 
 def test_battle_state_discards_drawn_cards_when_hand_is_full():
-    commander = Card("Commander", "Dark", 30)
+    player_hero = Card("Player Hero", "Dark", 30)
     deck_cards = [
         Card("Card 1", "Nature", 10),
         Card("Card 2", "Tech", 10),
         Card("Card 3", "Neutral", 10),
     ]
     battle_state = BattleState(
-        commander,
+        player_hero,
         deck_cards,
         starting_hand_size=2,
         max_hand_size=2,
@@ -240,13 +240,13 @@ def test_battle_state_discards_drawn_cards_when_hand_is_full():
     assert battle_state.player_discard_pile == result.discarded_cards
 
 
-def test_demo_deck_uses_target_size_and_excludes_commander():
-    commander = Card("Ishani", "Nature", 80)
+def test_demo_deck_uses_target_size_and_excludes_player_hero():
+    player_hero = Card("Ishani", "Nature", 80)
 
-    deck = create_demo_deck(commander, target_size=30)
+    deck = create_demo_deck(player_hero, target_size=30)
 
     assert len(deck) == 30
-    assert commander.name not in [card.name for card in deck]
+    assert player_hero.name not in [card.name for card in deck]
 
 
 def test_cards_can_store_card_type():
@@ -266,10 +266,10 @@ def test_cards_default_to_hero_type_for_existing_card_data():
 
 
 def test_only_hero_cards_can_be_played_to_battlefield():
-    commander = Card("Commander", "Dark", 30)
+    player_hero = Card("Player Hero", "Dark", 30)
     mana_card = Card("Mana", "Neutral", 0, card_type="Mana")
     battle_state = BattleState(
-        commander,
+        player_hero,
         [mana_card],
         starting_hand_size=1,
     )
