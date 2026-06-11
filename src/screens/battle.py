@@ -102,6 +102,10 @@ class BattleScreen:
                 print("Returning to menu screen")
                 self.game.change_screen("menu")
 
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1 and self.next_rect.collidepoint(event.pos):
+                self.handle_draw_result(self.battle_state.draw_cards(1))
+
         # Let HandView process drag/drop first
         self.hand_view.handle_event(event)
 
@@ -136,6 +140,16 @@ class BattleScreen:
             self.hand_view.build_fan()
         elif result.message:
             print(result.message) # Replace with UI feedback later.
+
+    def handle_draw_result(self, result):
+        if not result.success:
+            print("Deck is empty")
+            return
+
+        self.hand_view.build_fan()
+
+        if result.discarded_cards:
+            print("Hand is full. Excess drawn cards were discarded.")
 
     def get_card_under_mouse(self):
         mouse_pos = pygame.mouse.get_pos()
@@ -198,6 +212,18 @@ class BattleScreen:
             screen.blit(ability_text, (x, y + y_offset))
             y_offset += 25
 
+    def draw_deck_info(self, screen):
+        x = self.stats_rect.x + 10
+        y = self.stats_rect.bottom - 100
+
+        deck_text = self.card_font.render(f"Deck: {len(self.battle_state.player_deck)}", True, (255, 255, 255))
+        hand_text = self.card_font.render(f"Hand: {len(self.battle_state.player_hand)}/{self.battle_state.player_hand.max_size}", True, (255, 255, 255))
+        discard_text = self.card_font.render(f"Discard: {len(self.battle_state.player_discard_pile)}", True, (255, 255, 255))
+
+        screen.blit(deck_text, (x, y))
+        screen.blit(hand_text, (x, y + 25))
+        screen.blit(discard_text, (x, y + 50))
+
 
     def update(self):
         self.hand_view.update()
@@ -223,7 +249,9 @@ class BattleScreen:
         else:
             self.draw_card_info(screen, self.selected_card)
 
-        self.draw_zone(screen, self.next_rect, (255, 255, 0), "Next", text_colour=(0, 0, 0))
+        self.draw_deck_info(screen)
+
+        self.draw_zone(screen, self.next_rect, (255, 255, 0), "Draw", text_colour=(0, 0, 0))
         self.draw_zone(screen, self.hand_rect, (55, 0, 150), "Hand")
         self.draw_player_hero(screen)
         self.draw_zone(screen, self.enemy_hero_rect, (255, 100, 100), "Enemy Hero")
