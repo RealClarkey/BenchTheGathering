@@ -1,10 +1,7 @@
 import pygame
 from src.ui.hand_view import HandView
 
-from src.cards.card import Card
-from src.cards.ability import Ability
-from src.cards.buff import Buff
-
+from src.cards.card_catalog import create_demo_deck
 from src.gameplay.battle_state import BattleState
 
 
@@ -15,9 +12,10 @@ class BattleScreen:
         self.card_font = pygame.font.SysFont(None, 20)
 
         self.create_layout()
-        starting_hand = self.create_cards()
+        player_hero = self.game.selected_commander
+        deck_cards = create_demo_deck(player_hero)
 
-        self.battle_state = BattleState(starting_hand)
+        self.battle_state = BattleState(player_hero, deck_cards, starting_hand_size=7)
         self.selected_card = None
 
         self.hand_view = HandView(self.battle_state.player_hand.cards, self.hand_rect)
@@ -77,29 +75,6 @@ class BattleScreen:
         # Enemy hero area
         self.enemy_hero_rect = pygame.Rect(0, 0, int(width * 0.20), int(width * 0.20))
     
-    def create_cards(self):
-        # Dummy data for current development.
-        shadow_bolt = Ability(name="Shadow Bolt", attack_damage=8, mana_cost=3)
-        dark_inferno = Ability( name="Dark Inferno", attack_damage=15, mana_cost=6)
-
-        burning = Buff(name="Burning", description="Deals 2 damage per turn")
-
-        voldemort = Card(name="Voldemort", hero_type="Dark", hit_points=30)
-
-        voldemort.abilities.append(shadow_bolt)
-        voldemort.evolution_abilities.append(dark_inferno)
-        voldemort.buffs.append(burning)
-
-        knight = Card("Knight", "Neutral", 20)
-        elf = Card("Elf", "Nature", 20)
-        wizard = Card("Wizard", "Tech", 100)
-        troll = Card("Troll", "Dark", 80)
-
-
-
-        return [voldemort, knight, elf, wizard, troll]
-
-    # Draw player hero from dropped card.
     def draw_player_hero(self, screen):
         pygame.draw.rect(screen,(0, 100, 100), self.player_hero_rect)
 
@@ -136,8 +111,7 @@ class BattleScreen:
             drop_pos = self.hand_view.drop_position
 
             if self.player_hero_rect.collidepoint(drop_pos):
-                result = self.battle_state.choose_player_hero(dropped_card)
-                self.handle_play_result(result)
+                print("Commander is already selected")
             else:
                 for slot in self.player_battlefield_slots:
                     if slot.collidepoint(drop_pos):

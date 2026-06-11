@@ -16,7 +16,7 @@
 - Player Hero is selected from available hero cards, not drawn randomly
 - Player Hero starts on battlefield
 - Shuffle Deck
-- Draw starting hand
+- Draw 7 cards
 
 ---
 
@@ -54,8 +54,7 @@
 ---
 
 ## Hand Size
-- Starting hand size is still undecided
-- Starting hand can be higher than 7 if testing shows the game needs it
+- Players start with 7 cards
 - Players draw 1 card per turn
 - Maximum hand size is 7
 - If a player draws above 7 cards, excess cards are discarded
