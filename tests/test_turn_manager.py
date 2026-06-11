@@ -32,6 +32,14 @@ def test_start_phase_refills_player_mana():
     assert battle_state.player.current_mana == 3
 
 
+def test_player_starts_with_one_mana_after_choosing_commander():
+    commander = Card("Commander", "Dark", 30)
+    battle_state = BattleState(commander, [], starting_hand_size=0)
+
+    assert battle_state.player.max_mana == 1
+    assert battle_state.player.current_mana == 1
+
+
 def test_draw_phase_draws_one_card_once():
     commander = Card("Commander", "Dark", 30)
     deck_card = Card("Deck Card", "Nature", 10)

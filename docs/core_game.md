@@ -66,6 +66,7 @@
 ---
 
 ## Mana System
+- Players start at 1/1 mana after choosing their Player Hero
 - Mana cards increase max mana
 - Mana refills each turn
 - Current mana cannot exceed max mana

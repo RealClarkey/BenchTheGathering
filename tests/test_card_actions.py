@@ -49,8 +49,8 @@ def test_playing_mana_card_increases_player_mana():
     result = battle_state.play_mana_card(mana_card)
 
     assert result.success
-    assert battle_state.player.max_mana == 1
-    assert battle_state.player.current_mana == 1
+    assert battle_state.player.max_mana == 2
+    assert battle_state.player.current_mana == 2
     assert mana_card not in battle_state.player_hand.cards
     assert mana_card in battle_state.player_discard_pile
 
@@ -71,7 +71,7 @@ def test_only_one_mana_card_can_be_played_each_turn():
     assert first_result.success
     assert not second_result.success
     assert second_result.message == "You can only play one mana card per turn"
-    assert battle_state.player.max_mana == 1
+    assert battle_state.player.max_mana == 2
     assert second_mana in battle_state.player_hand.cards
 
 
@@ -94,7 +94,7 @@ def test_start_phase_resets_mana_play_limit():
     result = battle_state.play_mana_card(second_mana)
 
     assert result.success
-    assert battle_state.player.max_mana == 2
+    assert battle_state.player.max_mana == 3
 
 
 def test_attack_buff_skill_increases_battlefield_hero_attack():
@@ -144,6 +144,7 @@ def test_skill_card_requires_enough_mana():
         starting_hand_size=2,
     )
     battle_state.player_board.add_hero(hero)
+    battle_state.player.current_mana = 0
 
     result = battle_state.play_skill_card(skill_card, hero)
 

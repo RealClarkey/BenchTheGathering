@@ -15,8 +15,8 @@ class Player:
         self.max_hp = card.hit_points
         self.current_hp = self.max_hp
 
-        self.max_mana = 0
-        self.current_mana = 0
+        self.max_mana = 1
+        self.current_mana = 1
 
     def refresh_mana(self):
         self.current_mana = self.max_mana
