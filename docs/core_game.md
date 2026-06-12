@@ -84,6 +84,7 @@
 - Current prototype uses a default Enemy Player Hero and battlefield before AI exists
 - Attacks are only allowed during the Action Phase
 - Attacks cost 1 mana
+- Enemy Player Hero cannot be attacked while enemy battlefield heroes are active
 - Each hero can attack once per turn
 - Defeated enemy battlefield heroes are removed from battle
 

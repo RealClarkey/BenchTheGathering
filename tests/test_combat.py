@@ -94,6 +94,28 @@ def test_attack_can_target_enemy_player_hero():
     assert enemy_player_hero.current_hit_points == 15
 
 
+def test_enemy_player_hero_cannot_be_attacked_while_enemy_heroes_are_active():
+    attacker = Card("Attacker", "Tech", 10, attack=4)
+    enemy_player_hero = Card("Enemy Player Hero", "Dark", 20)
+    enemy_guard = Card("Enemy Guard", "Nature", 10)
+    battle_state = BattleState(
+        Card("Player Hero", "Dark", 30),
+        [],
+        starting_hand_size=0,
+        enemy_hero=enemy_player_hero,
+        enemy_board_cards=[enemy_guard],
+    )
+    battle_state.player_board.add_hero(attacker)
+    advance_to_action_phase(battle_state)
+
+    result = battle_state.attack(attacker, enemy_player_hero)
+
+    assert not result.success
+    assert result.message == "Enemy battlefield heroes must be defeated first"
+    assert enemy_player_hero.current_hit_points == 20
+    assert battle_state.player.current_mana == 1
+
+
 def test_reducing_enemy_player_hero_to_zero_ends_game():
     attacker = Card("Attacker", "Tech", 10, attack=4)
     enemy_player_hero = Card("Enemy Player Hero", "Dark", 5)

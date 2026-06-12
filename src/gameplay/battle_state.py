@@ -185,6 +185,9 @@ class BattleState:
         if target not in valid_targets:
             return CombatResult(False, "Target must be an enemy hero")
 
+        if target == self.enemy.hero and len(self.enemy_board.active_heroes) > 0:
+            return CombatResult(False, "Enemy battlefield heroes must be defeated first")
+
         if self.player.current_mana < self.attack_mana_cost:
             return CombatResult(False, "Not enough mana to attack")
 

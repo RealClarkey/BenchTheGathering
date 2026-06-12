@@ -1,6 +1,7 @@
 import pygame
 from src.ui.hand_view import HandView
 
+from src.assets import UIAssets
 from src.cards.card_catalog import create_default_enemy_setup, create_demo_deck
 from src.gameplay.battle_state import BattleState, PlayResult
 
@@ -10,8 +11,10 @@ class BattleScreen:
         self.game = game
         self.font = pygame.font.SysFont(None, 48)
         self.card_font = pygame.font.SysFont(None, 20)
+        self.ui_assets = UIAssets()
 
         self.create_layout()
+        self.create_scaled_assets()
         player_hero = self.game.selected_player_hero
         deck_cards = create_demo_deck(player_hero)
         enemy_hero, enemy_board_cards = create_default_enemy_setup()
@@ -108,9 +111,27 @@ class BattleScreen:
 
         # Status message area
         self.status_rect = pygame.Rect(int(width * 0.25), int(height * 0.70), int(width * 0.50), 45)
+
+    def create_scaled_assets(self):
+        self.background_image = self.ui_assets.scaled(
+            self.ui_assets.background,
+            (self.game.width, self.game.height),
+        )
+        self.player_hero_image = self.ui_assets.scaled(
+            self.ui_assets.player_hero,
+            self.player_hero_rect.size,
+        )
+        self.enemy_hero_image = self.ui_assets.scaled(
+            self.ui_assets.enemy_hero,
+            self.enemy_hero_rect.size,
+        )
+        self.next_turn_image = self.ui_assets.scaled(
+            self.ui_assets.next_turn,
+            self.next_rect.size,
+        )
     
     def draw_player_hero(self, screen):
-        pygame.draw.rect(screen,(0, 100, 100), self.player_hero_rect)
+        screen.blit(self.player_hero_image, self.player_hero_rect)
 
         player = self.battle_state.player
 
@@ -297,14 +318,10 @@ class BattleScreen:
         return None
     
     def draw_player_battlefield_slots(self, screen):
-        for slot in self.player_battlefield_slots:
-            pygame.draw.rect(screen, (120, 20, 20), slot)
-            pygame.draw.rect(screen, (255, 255, 255), slot, 2)
+        pass
 
     def draw_enemy_battlefield_slots(self, screen):
-        for slot in self.enemy_battlefield_slots:
-            pygame.draw.rect(screen, (120, 20, 20), slot)
-            pygame.draw.rect(screen, (255, 255, 255), slot, 2)
+        pass
     
     def draw_player_battlefield_cards(self, screen):
         for i, card in enumerate(self.battle_state.player_board.active_heroes):
@@ -398,7 +415,7 @@ class BattleScreen:
         screen.blit(discard_text, (x, y + 100))
 
     def draw_enemy_hero(self, screen):
-        pygame.draw.rect(screen, (255, 100, 100), self.enemy_hero_rect)
+        screen.blit(self.enemy_hero_image, self.enemy_hero_rect)
 
         enemy = self.battle_state.enemy
 
@@ -424,10 +441,8 @@ class BattleScreen:
 
 
     def draw(self, screen):
-        screen.fill((30, 110, 30))
+        screen.blit(self.background_image, (0, 0))
 
-        self.draw_zone(screen, self.enemy_battlefield_rect, (200, 50, 50), "Enemy Battlefield")
-        self.draw_zone(screen, self.player_battlefield_rect, (255, 50, 50), "Player Battlefield")
         self.draw_enemy_battlefield_slots(screen)
         self.draw_enemy_battlefield_cards(screen)
         self.draw_player_battlefield_slots(screen)
@@ -446,8 +461,7 @@ class BattleScreen:
         self.draw_deck_info(screen)
 
         self.draw_zone(screen, self.mulligan_rect, (230, 230, 230), "Mulligan", text_colour=(0, 0, 0))
-        self.draw_zone(screen, self.next_rect, (255, 255, 0), "Next Phase", text_colour=(0, 0, 0))
-        self.draw_zone(screen, self.hand_rect, (55, 0, 150), "Hand")
+        self.draw_next_phase_button(screen)
         self.draw_player_hero(screen)
         self.draw_enemy_hero(screen)
 
@@ -457,6 +471,9 @@ class BattleScreen:
 
         self.hand_view.draw(screen)
         self.draw_status_message(screen)
+
+    def draw_next_phase_button(self, screen):
+        screen.blit(self.next_turn_image, self.next_rect)
 
     def draw_zone(self, screen, rect, colour, label, text_colour=(255, 255, 255)):
         pygame.draw.rect(screen, colour, rect)
