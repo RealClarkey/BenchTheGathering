@@ -135,12 +135,12 @@ class BattleScreen:
             return
         
         name_text = self.card_font.render(player.hero.name, True, (255, 255, 255))
-        hp_text = self.card_font.render(f"HP: {player.current_hp}/{player.max_hp}", True, (255, 255, 255))
-        mana_text = self.card_font.render(f"Mana: {player.current_mana}/{player.max_mana}", True, (255, 255, 255))
+        hp_text = self.card_font.render(f"{player.current_hp}/{player.max_hp}", True, (255, 255, 255))
+        mana_text = self.card_font.render(f"{player.current_mana}/{player.max_mana}", True, (255, 255, 255))
 
-        screen.blit(name_text, (self.player_hero_rect.x + 15, self.player_hero_rect.y + 20))
-        screen.blit(hp_text, (self.player_hero_rect.x + 15, self.player_hero_rect.y + 55))
-        screen.blit(mana_text, (self.player_hero_rect.x + 15, self.player_hero_rect.y + 90))
+        screen.blit(name_text, (self.player_hero_rect.x + 95, self.player_hero_rect.y + 12))
+        screen.blit(hp_text, (self.player_hero_rect.x + 65, self.player_hero_rect.y + 205))
+        screen.blit(mana_text, (self.player_hero_rect.x + 175, self.player_hero_rect.y + 205))
 
 
     def handle_event(self, event):
@@ -340,7 +340,7 @@ class BattleScreen:
 
     def draw_battlefield_card_text(self, screen, card, rect):
         name_text = self.card_font.render(card.name, True, (0, 0, 0))
-        hp_text = self.card_font.render(f"HP: {card.current_hit_points}/{card.hit_points}", True, (0, 0, 0))
+        hp_text = self.card_font.render(f"{card.current_hit_points}/{card.hit_points}", True, (0, 0, 0))
         attack_text = self.card_font.render(f"ATK: {card.attack}", True, (0, 0, 0))
         cost_text = self.card_font.render("Cost: 1", True, (0, 0, 0))
 
