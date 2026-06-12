@@ -458,10 +458,6 @@ class BattleScreen:
         self.draw_player_hero(screen)
         self.draw_enemy_hero(screen)
 
-        info_text = self.font.render("Press ESC to return to menu", True, (255, 255, 255))
-
-        screen.blit(info_text, (330, 350))
-
         self.hand_view.draw(screen)
         self.draw_status_message(screen)
 
