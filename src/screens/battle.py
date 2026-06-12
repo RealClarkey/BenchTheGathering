@@ -92,10 +92,12 @@ class BattleScreen:
         self.stats_rect.topright = (width, 0)
         
         # Next action area
-        self.next_rect = pygame.Rect(int(width * 0.80), int(height * 0.90), int(width * 0.19), int(height * 0.070))
+        self.next_rect = self.ui_assets.next_turn.get_rect()
+        self.next_rect.bottomright = (width - 15, height - 15)
 
         # Mulligan area
-        self.mulligan_rect = pygame.Rect(int(width * 0.80), int(height * 0.81), int(width * 0.19), int(height * 0.070))
+        self.mulligan_rect = pygame.Rect(0, 0, self.next_rect.width, 60)
+        self.mulligan_rect.bottomright = (self.next_rect.right, self.next_rect.top - 15)
 
         # Hand area (cards) THIS WILL NEED TO BE LOOKED AT DUE TO MOVING HAND FEATURE OVER
         self.hand_rect = pygame.Rect(0, 0, int(width * 0.60), int(height * 0.33))
@@ -103,11 +105,11 @@ class BattleScreen:
         self.hand_rect.bottom = height
 
         # Player hero area
-        self.player_hero_rect = pygame.Rect(0, 0, int(width * 0.20), int(width * 0.20))
+        self.player_hero_rect = self.ui_assets.player_hero.get_rect()
         self.player_hero_rect.bottom = height
 
         # Enemy hero area
-        self.enemy_hero_rect = pygame.Rect(0, 0, int(width * 0.20), int(width * 0.20))
+        self.enemy_hero_rect = self.ui_assets.enemy_hero.get_rect()
 
         # Status message area
         self.status_rect = pygame.Rect(int(width * 0.25), int(height * 0.70), int(width * 0.50), 45)
@@ -117,18 +119,9 @@ class BattleScreen:
             self.ui_assets.background,
             (self.game.width, self.game.height),
         )
-        self.player_hero_image = self.ui_assets.scaled(
-            self.ui_assets.player_hero,
-            self.player_hero_rect.size,
-        )
-        self.enemy_hero_image = self.ui_assets.scaled(
-            self.ui_assets.enemy_hero,
-            self.enemy_hero_rect.size,
-        )
-        self.next_turn_image = self.ui_assets.scaled(
-            self.ui_assets.next_turn,
-            self.next_rect.size,
-        )
+        self.player_hero_image = self.ui_assets.player_hero
+        self.enemy_hero_image = self.ui_assets.enemy_hero
+        self.next_turn_image = self.ui_assets.next_turn
     
     def draw_player_hero(self, screen):
         screen.blit(self.player_hero_image, self.player_hero_rect)
