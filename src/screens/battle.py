@@ -415,10 +415,12 @@ class BattleScreen:
         enemy = self.battle_state.enemy
 
         name_text = self.card_font.render(enemy.hero.name, True, (0, 0, 0))
-        hp_text = self.card_font.render(f"HP: {enemy.hero.current_hit_points}/{enemy.hero.hit_points}", True, (0, 0, 0))
+        hp_text = self.card_font.render(f"{enemy.hero.current_hit_points}/{enemy.hero.hit_points}", True, (0, 0, 0))
+        mana_text = self.card_font.render(f"{enemy.current_mana}/{enemy.max_mana}", True, (0, 0, 0))
 
-        screen.blit(name_text, (self.enemy_hero_rect.x + 15, self.enemy_hero_rect.y + 20))
-        screen.blit(hp_text, (self.enemy_hero_rect.x + 15, self.enemy_hero_rect.y + 55))
+        screen.blit(name_text, (self.enemy_hero_rect.x + 95, self.enemy_hero_rect.y + 12))
+        screen.blit(hp_text, (self.enemy_hero_rect.x + 65, self.enemy_hero_rect.y + 175))
+        screen.blit(mana_text, (self.enemy_hero_rect.x + 175, self.enemy_hero_rect.y + 175))
 
     def draw_status_message(self, screen):
         pygame.draw.rect(screen, (20, 20, 20), self.status_rect)
