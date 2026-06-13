@@ -7,6 +7,8 @@ from src.gameplay.battle_state import BattleState, PlayResult
 
 
 class BattleScreen:
+    BATTLEFIELD_SLOT_COUNT = 4
+
     def __init__(self, game):
         self.game = game
         self.font = pygame.font.SysFont(None, 48)
@@ -44,17 +46,17 @@ class BattleScreen:
         self.player_battlefield_rect = pygame.Rect(int(width * 0.20), int(height * 0.34), int(width * 0.60), int(height * 0.34))
         self.player_battlefield_rect.centerx = width // 2 
 
-        slot_width = int(self.player_battlefield_rect.width * 0.25)
+        slot_width = int(self.player_battlefield_rect.width * 0.20)
         slot_height = int(self.player_battlefield_rect.height * 0.75)
-        slot_gap = int(self.player_battlefield_rect.width * 0.05)
+        slot_gap = int(self.player_battlefield_rect.width * 0.04)
 
-        total_width = (slot_width * 3) + (slot_gap * 2)
+        total_width = (slot_width * self.BATTLEFIELD_SLOT_COUNT) + (slot_gap * (self.BATTLEFIELD_SLOT_COUNT - 1))
         start_x = self.player_battlefield_rect.centerx - total_width // 2
         slot_y = self.player_battlefield_rect.centery - slot_height // 2
 
         self.player_battlefield_slots = []
 
-        for i in range(3):
+        for i in range(self.BATTLEFIELD_SLOT_COUNT):
             slot_rect = pygame.Rect(
                 start_x + i * (slot_width + slot_gap),
                 slot_y,
@@ -68,17 +70,17 @@ class BattleScreen:
         self.enemy_battlefield_rect = pygame.Rect(int(width * 0.20), 0, int(width * 0.60), int(height * 0.34))
         self.enemy_battlefield_rect.centerx = width // 2 
 
-        enemy_slot_width = int(self.enemy_battlefield_rect.width * 0.25)
+        enemy_slot_width = int(self.enemy_battlefield_rect.width * 0.20)
         enemy_slot_height = int(self.enemy_battlefield_rect.height * 0.75)
-        enemy_slot_gap = int(self.enemy_battlefield_rect.width * 0.05)
+        enemy_slot_gap = int(self.enemy_battlefield_rect.width * 0.04)
 
-        enemy_total_width = (enemy_slot_width * 3) + (enemy_slot_gap * 2)
+        enemy_total_width = (enemy_slot_width * self.BATTLEFIELD_SLOT_COUNT) + (enemy_slot_gap * (self.BATTLEFIELD_SLOT_COUNT - 1))
         enemy_start_x = self.enemy_battlefield_rect.centerx - enemy_total_width // 2
         enemy_slot_y = self.enemy_battlefield_rect.centery - enemy_slot_height // 2
 
         self.enemy_battlefield_slots = []
 
-        for i in range(3):
+        for i in range(self.BATTLEFIELD_SLOT_COUNT):
             slot_rect = pygame.Rect(
                 enemy_start_x + i * (enemy_slot_width + enemy_slot_gap),
                 enemy_slot_y,

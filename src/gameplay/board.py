@@ -1,5 +1,5 @@
 class Board:
-    def __init__(self, max_active_heroes=3):
+    def __init__(self, max_active_heroes=4):
         self.max_active_heroes = max_active_heroes
         self.active_heroes = []
 

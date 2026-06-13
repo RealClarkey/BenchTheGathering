@@ -280,3 +280,34 @@ def test_only_hero_cards_can_be_played_to_battlefield():
     assert result.message == "Only hero cards can be played to the battlefield"
     assert mana_card in battle_state.player_hand.cards
     assert mana_card not in battle_state.player_board.active_heroes
+
+
+def test_four_player_heroes_can_be_played_to_battlefield():
+    player_hero = Card("Player Hero", "Dark", 30)
+    heroes = [
+        Card("Hero 1", "Nature", 10),
+        Card("Hero 2", "Tech", 10),
+        Card("Hero 3", "Dark", 10),
+        Card("Hero 4", "Neutral", 10),
+        Card("Hero 5", "Nature", 10),
+    ]
+    battle_state = BattleState(
+        player_hero,
+        heroes,
+        starting_hand_size=5,
+        shuffle_deck=False,
+    )
+
+    results = []
+    for hero in heroes[:4]:
+        battle_state.has_played_main_card_this_turn = False
+        results.append(battle_state.play_card_to_player_battlefield(hero))
+
+    battle_state.has_played_main_card_this_turn = False
+    fifth_result = battle_state.play_card_to_player_battlefield(heroes[4])
+
+    assert all(result.success for result in results)
+    assert len(battle_state.player_board.active_heroes) == 4
+    assert not fifth_result.success
+    assert fifth_result.message == "Battlefield is full"
+    assert heroes[4] in battle_state.player_hand.cards
