@@ -114,7 +114,7 @@ class BattleScreen:
         self.enemy_hero_rect = self.ui_assets.enemy_hero.get_rect()
 
         # Status message area
-        self.status_rect = pygame.Rect(int(width * 0.25), int(height * 0.70), int(width * 0.50), 45)
+        self.status_rect = pygame.Rect(int(width * 0.25), int(height * 0.54), int(width * 0.50), 45)
 
     def create_scaled_assets(self):
         self.background_image = self.ui_assets.scaled(

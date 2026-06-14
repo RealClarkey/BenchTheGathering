@@ -90,11 +90,11 @@ class HandView:
         self.hand_rect = hand_rect
 
         self.card_ratio = 0.72
-        self.card_height = int(hand_rect.height * 1.2) #1.7 was default
+        self.card_height = int(hand_rect.height * 0.82)
         self.card_width = int(self.card_height * self.card_ratio)
 
-        self.radius = int(hand_rect.width * 0.95) #0.95 default
-        self.angle_step = 7
+        self.radius = int(hand_rect.width * 1.75)
+        self.angle_step = 5
 
         self.card_views = []
         self.hovered_card = None
@@ -117,7 +117,7 @@ class HandView:
             return
 
         fan_center_x = self.hand_rect.centerx
-        fan_center_y = self.hand_rect.bottom + int(self.hand_rect.height * 2.75) #3.5 as default
+        fan_center_y = self.hand_rect.bottom + self.radius - int(self.card_height * 0.76)
 
         centre_index = (num_cards - 1) / 2
 
