@@ -160,7 +160,11 @@ class BattleScreen:
                 if result is not None:
                     self.handle_draw_result(result)
 
-            if event.button == 1 and self.mulligan_rect.collidepoint(event.pos):
+            if (
+                event.button == 1
+                and self.battle_state.can_mulligan()
+                and self.mulligan_rect.collidepoint(event.pos)
+            ):
                 result = self.battle_state.mulligan()
                 self.handle_mulligan_result(result)
 
@@ -457,7 +461,8 @@ class BattleScreen:
 
         self.draw_deck_info(screen)
 
-        self.draw_zone(screen, self.mulligan_rect, (230, 230, 230), "Mulligan", text_colour=(0, 0, 0))
+        if self.battle_state.can_mulligan():
+            self.draw_zone(screen, self.mulligan_rect, (230, 230, 230), "Mulligan", text_colour=(0, 0, 0))
         self.draw_next_phase_button(screen)
         self.draw_player_hero(screen)
         self.draw_enemy_hero(screen)

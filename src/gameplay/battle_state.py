@@ -100,6 +100,14 @@ class BattleState:
         self.turn_manager.advance_phase()
         return self.resolve_current_phase()
 
+    def can_mulligan(self):
+        return (
+            not self.has_used_mulligan
+            and self.turn_manager.turn_number == 1
+            and self.turn_manager.current_phase == "start"
+            and not self.has_played_card_this_game
+        )
+
     def mulligan(self):
         if self.has_used_mulligan:
             return PlayResult(False, "Mulligan already used")

@@ -157,6 +157,44 @@ def test_mulligan_not_available_after_playing_mana_card():
     assert result.message == "Mulligan only available before playing a card"
 
 
+def test_mulligan_availability_is_removed_after_playing_card():
+    player_hero = Card("Player Hero", "Dark", 30)
+    hero_card = Card("Hero", "Nature", 10)
+    battle_state = BattleState(
+        player_hero,
+        [hero_card],
+        starting_hand_size=1,
+        shuffle_deck=False,
+    )
+
+    assert battle_state.can_mulligan()
+
+    battle_state.play_card_to_player_battlefield(hero_card)
+
+    assert not battle_state.can_mulligan()
+
+
+def test_mulligan_availability_is_removed_after_mulligan_used():
+    player_hero = Card("Player Hero", "Dark", 30)
+    deck_cards = [
+        Card("First", "Nature", 10),
+        Card("Second", "Tech", 10),
+        Card("Third", "Dark", 10),
+    ]
+    battle_state = BattleState(
+        player_hero,
+        deck_cards,
+        starting_hand_size=2,
+        shuffle_deck=False,
+    )
+
+    assert battle_state.can_mulligan()
+
+    battle_state.mulligan()
+
+    assert not battle_state.can_mulligan()
+
+
 def test_mulligan_not_available_after_playing_hero_card():
     player_hero = Card("Player Hero", "Dark", 30)
     hero_card = Card("Hero", "Nature", 10)
