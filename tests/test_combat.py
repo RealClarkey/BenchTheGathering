@@ -188,3 +188,28 @@ def test_attacker_can_only_attack_once_per_turn():
     assert not second_result.success
     assert second_result.message == "This hero has already attacked this turn"
     assert second_target.current_hit_points == 10
+
+
+def test_same_named_attacker_cards_act_independently():
+    first_attacker = Card("Moldrax", "Dark", 10, attack=4)
+    second_attacker = Card("Moldrax", "Dark", 10, attack=4)
+    first_target = Card("First Target", "Nature", 10)
+    second_target = Card("Second Target", "Nature", 10)
+    battle_state = BattleState(Card("Player Hero", "Dark", 30), [], starting_hand_size=0)
+    battle_state.player.max_mana = 2
+    battle_state.player.current_mana = 2
+    battle_state.player_board.add_hero(first_attacker)
+    battle_state.player_board.add_hero(second_attacker)
+    battle_state.enemy_board.add_hero(first_target)
+    battle_state.enemy_board.add_hero(second_target)
+    advance_to_action_phase(battle_state)
+    battle_state.player.current_mana = 2
+
+    first_result = battle_state.attack(first_attacker, first_target)
+    second_result = battle_state.attack(second_attacker, second_target)
+
+    assert first_attacker is not second_attacker
+    assert first_result.success
+    assert second_result.success
+    assert first_target.current_hit_points == 5
+    assert second_target.current_hit_points == 5

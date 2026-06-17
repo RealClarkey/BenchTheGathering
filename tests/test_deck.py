@@ -287,6 +287,20 @@ def test_demo_deck_uses_target_size_and_excludes_player_hero():
     assert player_hero.name not in [card.name for card in deck]
 
 
+def test_demo_deck_repeated_cards_are_independent_instances():
+    player_hero = Card("Ishani", "Nature", 80)
+
+    deck = create_demo_deck(player_hero, target_size=30)
+    moldrax_cards = [card for card in deck if card.name == "Moldrax"]
+
+    assert len(moldrax_cards) > 1
+    assert moldrax_cards[0] is not moldrax_cards[1]
+
+    moldrax_cards[0].current_hit_points -= 5
+
+    assert moldrax_cards[1].current_hit_points == moldrax_cards[1].hit_points
+
+
 def test_cards_can_store_card_type():
     hero = Card("Hero", "Dark", 30, card_type="Hero")
     mana = Card("Mana", "Neutral", 0, card_type="Mana")

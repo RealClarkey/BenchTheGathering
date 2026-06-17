@@ -79,7 +79,7 @@ def create_demo_card_pool(player_hero):
 def add_repeated_cards(deck, source_cards, amount):
     while len(deck) < amount:
         for card in source_cards:
-            deck.append(card)
+            deck.append(card.copy())
 
             if len(deck) == amount:
                 break

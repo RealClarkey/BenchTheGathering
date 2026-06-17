@@ -29,6 +29,25 @@ class Card:
         self.buffs = []
         self.abilities = []
         self.evolution_abilities = []
+
+    def copy(self):
+        card = Card(
+            name=self.name,
+            hero_type=self.hero_type,
+            hit_points=self.hit_points,
+            card_type=self.card_type,
+            attack=self.attack,
+            mana_value=self.mana_value,
+            mana_cost=self.mana_cost,
+            effect=self.effect,
+            attack_bonus=self.attack_bonus,
+        )
+        card.current_hit_points = self.current_hit_points
+        card.image = self.image
+        card.buffs = list(self.buffs)
+        card.abilities = list(self.abilities)
+        card.evolution_abilities = list(self.evolution_abilities)
+        return card
         
 '''
 ## Hero Card:
