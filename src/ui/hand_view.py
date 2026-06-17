@@ -113,6 +113,10 @@ class HandView:
                 self.card_assets.mana,
                 (self.card_width, self.card_height),
             ),
+            "Skill": pygame.transform.smoothscale(
+                self.card_assets.battle,
+                (self.card_width, self.card_height),
+            ),
         }
 
         self.card_views = []

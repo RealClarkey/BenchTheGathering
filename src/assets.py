@@ -38,6 +38,7 @@ class UIAssets:
 
 class CardAssets:
     def __init__(self):
+        self.battle = self.load("battle.png")
         self.mana = self.load("mana.png")
 
     def load(self, filename):
