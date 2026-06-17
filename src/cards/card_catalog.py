@@ -8,13 +8,13 @@ def create_hero_cards():
     dark_inferno = Ability(name="Dark Inferno", attack_damage=15, mana_cost=6)
     burning = Buff(name="Burning", description="Deals 2 damage per turn")
 
-    voldemort = Card(name="Voldemort", hero_type="Dark", hit_points=30)
-    voldemort.abilities.append(shadow_bolt)
-    voldemort.evolution_abilities.append(dark_inferno)
-    voldemort.buffs.append(burning)
+    moldrax = Card(name="Moldrax", hero_type="Dark", hit_points=30)
+    moldrax.abilities.append(shadow_bolt)
+    moldrax.evolution_abilities.append(dark_inferno)
+    moldrax.buffs.append(burning)
 
     return [
-        voldemort,
+        moldrax,
         Card("Knight", "Neutral", 20, attack=2),
         Card("Elf", "Nature", 20, attack=2),
         Card("Wizard", "Tech", 100, attack=1),

@@ -39,7 +39,9 @@ class UIAssets:
 class CardAssets:
     def __init__(self):
         self.battle = self.load("battle.png")
+        self.knight = self.load("knight.png")
         self.mana = self.load("mana.png")
+        self.moldrax = self.load("moldrax.png")
 
     def load(self, filename):
         return pygame.image.load(str(CARD_ASSET_DIR / filename)).convert_alpha()

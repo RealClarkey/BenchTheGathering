@@ -118,6 +118,16 @@ class HandView:
                 (self.card_width, self.card_height),
             ),
         }
+        self.named_card_images = {
+            "Knight": pygame.transform.smoothscale(
+                self.card_assets.knight,
+                (self.card_width, self.card_height),
+            ),
+            "Moldrax": pygame.transform.smoothscale(
+                self.card_assets.moldrax,
+                (self.card_width, self.card_height),
+            ),
+        }
 
         self.card_views = []
         self.hovered_card = None
@@ -209,8 +219,11 @@ class HandView:
                 screen,
                 self.font,
                 hovered=(card_view == self.hovered_card),
-                card_image=self.card_images.get(card_view.card.card_type),
+                card_image=self.image_for_card(card_view.card),
             )
+
+    def image_for_card(self, card):
+        return self.named_card_images.get(card.name) or self.card_images.get(card.card_type)
 
     def get_hovered_card(self, mouse_pos):
         for card_view in reversed(self.card_views):
