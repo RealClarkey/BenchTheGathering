@@ -109,9 +109,11 @@ class BattleScreen:
         # Player hero area
         self.player_hero_rect = self.ui_assets.player_hero.get_rect()
         self.player_hero_rect.bottom = height
+        self.player_hero_rect.bottomleft = (15, height - 20)
 
         # Enemy hero area
         self.enemy_hero_rect = self.ui_assets.enemy_hero.get_rect()
+        self.enemy_hero_rect.topleft = (15, 15)
 
         # Status message area
         self.status_rect = pygame.Rect(int(width * 0.25), int(height * 0.54), int(width * 0.50), 45)
