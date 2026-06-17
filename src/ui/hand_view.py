@@ -3,6 +3,8 @@ import math
 import pygame
 import pygame.gfxdraw
 
+from src.assets import CardAssets
+
 
 class FanCardView:
     def __init__(self, card, home_center, width, height, angle):
@@ -32,7 +34,7 @@ class FanCardView:
                 self.pos = self.home_center.copy()
                 self.is_returning = False
 
-    def draw(self, screen, font, hovered=False):
+    def draw(self, screen, font, hovered=False, card_image=None):
         draw_pos = self.pos.copy()
 
         if hovered and not self.is_dragging and not self.is_returning:
@@ -56,6 +58,16 @@ class FanCardView:
             rotated_corners.append((draw_pos.x + rotated_x, draw_pos.y + rotated_y))
 
         border_colour = (255, 215, 0) if hovered else (0, 0, 0)
+
+        if card_image is not None:
+            if hovered:
+                pygame.gfxdraw.filled_polygon(screen, rotated_corners, border_colour)
+                pygame.gfxdraw.aapolygon(screen, rotated_corners, border_colour)
+
+            rotated_image = pygame.transform.rotate(card_image, -self.angle)
+            image_rect = rotated_image.get_rect(center=draw_pos)
+            screen.blit(rotated_image, image_rect)
+            return
 
         pygame.gfxdraw.filled_polygon(screen, rotated_corners, border_colour)
         pygame.gfxdraw.aapolygon(screen, rotated_corners, border_colour)
@@ -95,6 +107,13 @@ class HandView:
 
         self.radius = int(hand_rect.width * 1.75)
         self.angle_step = 5
+        self.card_assets = CardAssets()
+        self.card_images = {
+            "Mana": pygame.transform.smoothscale(
+                self.card_assets.mana,
+                (self.card_width, self.card_height),
+            ),
+        }
 
         self.card_views = []
         self.hovered_card = None
@@ -186,6 +205,7 @@ class HandView:
                 screen,
                 self.font,
                 hovered=(card_view == self.hovered_card),
+                card_image=self.card_images.get(card_view.card.card_type),
             )
 
     def get_hovered_card(self, mouse_pos):

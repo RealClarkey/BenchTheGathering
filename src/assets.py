@@ -6,6 +6,7 @@ import pygame
 BASE_DIR = Path(__file__).resolve().parent.parent
 UI_ASSET_DIR = BASE_DIR / "assets" / "images" / "ui"
 LOGO_ASSET_DIR = BASE_DIR / "assets" / "images" / "logo"
+CARD_ASSET_DIR = BASE_DIR / "assets" / "images" / "cards"
 
 
 class UIAssets:
@@ -33,3 +34,11 @@ class UIAssets:
             int(surface.get_height() * scale),
         )
         return self.scaled(surface, size)
+
+
+class CardAssets:
+    def __init__(self):
+        self.mana = self.load("mana.png")
+
+    def load(self, filename):
+        return pygame.image.load(str(CARD_ASSET_DIR / filename)).convert_alpha()
