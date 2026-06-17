@@ -1,7 +1,7 @@
 import pygame
 from src.ui.hand_view import HandView
 
-from src.assets import UIAssets
+from src.assets import CardAssets, UIAssets
 from src.cards.card_catalog import create_default_enemy_setup, create_demo_deck
 from src.gameplay.battle_state import BattleState, PlayResult
 
@@ -14,6 +14,8 @@ class BattleScreen:
         self.font = pygame.font.SysFont(None, 48)
         self.card_font = pygame.font.SysFont(None, 20)
         self.ui_assets = UIAssets()
+        self.card_assets = CardAssets()
+        self.battlefield_card_image_cache = {}
 
         self.create_layout()
         self.create_scaled_assets()
@@ -330,21 +332,39 @@ class BattleScreen:
 
             rect = self.get_card_rect_for_slot(slot)
 
-            pygame.draw.rect(screen, (220, 220, 220), rect)
+            card_image = self.battlefield_image_for_card(card, rect.size)
             border_colour = (255, 215, 0) if card == self.selected_attacker else (0, 0, 0)
-            pygame.draw.rect(screen, border_colour, rect, 3)
 
-            self.draw_battlefield_card_text(screen, card, rect)
+            if card_image is not None:
+                screen.blit(card_image, rect)
+                pygame.draw.rect(screen, border_colour, rect, 3)
+            else:
+                pygame.draw.rect(screen, (220, 220, 220), rect)
+                pygame.draw.rect(screen, border_colour, rect, 3)
+                self.draw_battlefield_card_text(screen, card, rect)
 
     def draw_enemy_battlefield_cards(self, screen):
         for i, card in enumerate(self.battle_state.enemy_board.active_heroes):
             slot = self.enemy_battlefield_slots[i]
             rect = self.get_card_rect_for_slot(slot)
 
-            pygame.draw.rect(screen, (220, 220, 220), rect)
-            pygame.draw.rect(screen, (0, 0, 0), rect, 2)
+            card_image = self.battlefield_image_for_card(card, rect.size)
 
-            self.draw_battlefield_card_text(screen, card, rect)
+            if card_image is not None:
+                screen.blit(card_image, rect)
+                pygame.draw.rect(screen, (0, 0, 0), rect, 2)
+            else:
+                pygame.draw.rect(screen, (220, 220, 220), rect)
+                pygame.draw.rect(screen, (0, 0, 0), rect, 2)
+                self.draw_battlefield_card_text(screen, card, rect)
+
+    def battlefield_image_for_card(self, card, size):
+        cache_key = (card.name, card.card_type, size)
+
+        if cache_key not in self.battlefield_card_image_cache:
+            self.battlefield_card_image_cache[cache_key] = self.card_assets.scaled_image_for_card(card, size)
+
+        return self.battlefield_card_image_cache[cache_key]
 
     def draw_battlefield_card_text(self, screen, card, rect):
         name_text = self.card_font.render(card.name, True, (0, 0, 0))

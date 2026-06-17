@@ -1,5 +1,6 @@
 import pygame
 
+from src.assets import CardAssets
 from src.cards.card_catalog import create_hero_cards
 
 
@@ -10,6 +11,8 @@ class PlayerHeroSelectScreen:
         self.card_font = pygame.font.SysFont(None, 24)
         self.heroes = create_hero_cards()
         self.hero_rects = []
+        self.card_assets = CardAssets()
+        self.card_image_cache = {}
 
         self.create_layout()
 
@@ -53,6 +56,13 @@ class PlayerHeroSelectScreen:
         screen.blit(title_text, title_rect)
 
         for hero, rect in self.hero_rects:
+            card_image = self.image_for_card(hero, rect.size)
+
+            if card_image is not None:
+                screen.blit(card_image, rect)
+                pygame.draw.rect(screen, (0, 0, 0), rect, 2)
+                continue
+
             pygame.draw.rect(screen, (220, 220, 220), rect)
             pygame.draw.rect(screen, (0, 0, 0), rect, 2)
 
@@ -63,3 +73,11 @@ class PlayerHeroSelectScreen:
             screen.blit(name_text, (rect.x + 12, rect.y + 24))
             screen.blit(type_text, (rect.x + 12, rect.y + 64))
             screen.blit(hp_text, (rect.x + 12, rect.y + 104))
+
+    def image_for_card(self, card, size):
+        cache_key = (card.name, card.card_type, size)
+
+        if cache_key not in self.card_image_cache:
+            self.card_image_cache[cache_key] = self.card_assets.scaled_image_for_card(card, size)
+
+        return self.card_image_cache[cache_key]

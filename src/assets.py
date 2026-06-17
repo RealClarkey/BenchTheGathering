@@ -42,6 +42,25 @@ class CardAssets:
         self.knight = self.load("knight.png")
         self.mana = self.load("mana.png")
         self.moldrax = self.load("moldrax.png")
+        self.type_images = {
+            "Mana": self.mana,
+            "Skill": self.battle,
+        }
+        self.named_images = {
+            "Knight": self.knight,
+            "Moldrax": self.moldrax,
+        }
 
     def load(self, filename):
         return pygame.image.load(str(CARD_ASSET_DIR / filename)).convert_alpha()
+
+    def image_for_card(self, card):
+        return self.named_images.get(card.name) or self.type_images.get(card.card_type)
+
+    def scaled_image_for_card(self, card, size):
+        image = self.image_for_card(card)
+
+        if image is None:
+            return None
+
+        return pygame.transform.smoothscale(image, size)

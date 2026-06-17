@@ -108,26 +108,7 @@ class HandView:
         self.radius = int(hand_rect.width * 1.75)
         self.angle_step = 5
         self.card_assets = CardAssets()
-        self.card_images = {
-            "Mana": pygame.transform.smoothscale(
-                self.card_assets.mana,
-                (self.card_width, self.card_height),
-            ),
-            "Skill": pygame.transform.smoothscale(
-                self.card_assets.battle,
-                (self.card_width, self.card_height),
-            ),
-        }
-        self.named_card_images = {
-            "Knight": pygame.transform.smoothscale(
-                self.card_assets.knight,
-                (self.card_width, self.card_height),
-            ),
-            "Moldrax": pygame.transform.smoothscale(
-                self.card_assets.moldrax,
-                (self.card_width, self.card_height),
-            ),
-        }
+        self.card_image_cache = {}
 
         self.card_views = []
         self.hovered_card = None
@@ -223,7 +204,15 @@ class HandView:
             )
 
     def image_for_card(self, card):
-        return self.named_card_images.get(card.name) or self.card_images.get(card.card_type)
+        cache_key = (card.name, card.card_type)
+
+        if cache_key not in self.card_image_cache:
+            self.card_image_cache[cache_key] = self.card_assets.scaled_image_for_card(
+                card,
+                (self.card_width, self.card_height),
+            )
+
+        return self.card_image_cache[cache_key]
 
     def get_hovered_card(self, mouse_pos):
         for card_view in reversed(self.card_views):
