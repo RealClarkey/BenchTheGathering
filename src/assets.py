@@ -39,16 +39,24 @@ class UIAssets:
 class CardAssets:
     def __init__(self):
         self.battle = self.load("battle.png")
+        self.elf = self.load("elf.png")
+        self.ishani = self.load("ishani.png")
         self.knight = self.load("knight.png")
         self.mana = self.load("mana.png")
         self.moldrax = self.load("moldrax.png")
+        self.troll = self.load("troll.png")
+        self.wizard = self.load("wizard.png")
         self.type_images = {
             "Mana": self.mana,
             "Skill": self.battle,
         }
         self.named_images = {
+            "Elf": self.elf,
+            "Ishani": self.ishani,
             "Knight": self.knight,
             "Moldrax": self.moldrax,
+            "Troll": self.troll,
+            "Wizard": self.wizard,
         }
 
     def load(self, filename):
